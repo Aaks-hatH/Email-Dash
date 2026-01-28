@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Security API - Admin Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    /* Connection Panel */
+    .connection-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+
+    .status-dot.connected {
+      background: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .status-text.connected {
+      color: #10b981;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .stat-change {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stat-change.positive {
+      color: #10b981;
+    }
+
+    .stat-change.negative {
+      color: #ef4444;
+    }
+
+    /* Tabs */
+    .tabs {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: #f3f4f6;
+      color: #667eea;
+    }
+
+    .tab-btn.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* IP Table */
+    .ip-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ip-table th {
+      text-align: left;
+      padding: 12px;
+      background: #f9fafb;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ip-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .ip-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge.blocked {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.good {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    /* Charts */
+    .chart-container {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+
+    .spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error */
+    .error {
+      background: #fee2e2;
+      border: 2px solid #fecaca;
+      border-radius: 12px;
+      padding: 16px;
+      color: #991b1b;
+      margin-bottom: 20px;
+    }
+
+    /* Refresh Button */
+    .refresh-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #667eea;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tab-buttons {
+        flex-wrap: wrap;
+      }
+
+      .ip-table {
+        font-size: 12px;
+      }
+
+      .ip-table th,
+      .ip-table td {
+        padding: 8px;
+      }
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+
+    .action-btn.danger {
+      background: #ef4444;
+    }
+
+    .action-btn.danger:hover {
+      background: #dc2626;
+    }
+
+    .action-btn.success {
+      background: #10b981;
+    }
+
+    .action-btn.success:hover {
+      background: #059669;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🛡️ Email Security API</h1>
+      <p>Admin Dashboard - Monitor and manage your email security backend</p>
+    </div>
+
+    <!-- Connection Panel -->
+    <div class="connection-panel">
+      <div class="connection-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Not Connected</span>
+      </div>
+
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="apiUrl" 
+          placeholder="API URL (e.g., https://your-backend.com)"
+          value="http://localhost:10000"
+        >
+        <input 
+          type="password" 
+          id="adminKey" 
+          placeholder="Admin API Key"
+        >
+        <button onclick="connect()">Connect</button>
+      </div>
+      
+      <p class="small-text">💡 Your credentials are stored locally in your browser and never sent anywhere except your API</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" id="statsGrid" style="display: none;">
+      <div class="stat-card">
+        <div class="stat-icon">📧</div>
+        <div class="stat-label">Total Analyzed</div>
+        <div class="stat-value" id="totalAnalyzed">-</div>
+        <div class="stat-change positive" id="analyzedChange"></div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-label">Threats Detected</div>
+        <div class="stat-value" id="threatsDetected">-</div>
+        <div class="stat-change negative" id="threatsChange"></div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🌐</div>
+        <div class="stat-label">Tracked IPs</div>
+        <div class="stat-value" id="trackedIPs">-</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-label">Blocked IPs</div>
+        <div class="stat-value" id="blockedIPs">-</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💾</div>
+        <div class="stat-label">Cache Size</div>
+        <div class="stat-value" id="cacheSize">-</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Avg Risk Score</div>
+        <div class="stat-value" id="avgRiskScore">-</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabsPanel" style="display: none;">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+        <button class="tab-btn" onclick="switchTab('ips')">🌐 IP Management</button>
+        <button class="tab-btn" onclick="switchTab('learning')">🧠 Learning Data</button>
+        <button class="tab-btn" onclick="switchTab('test')">🧪 Test API</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div class="tab-content active" id="overview-tab">
+        <h3 style="margin-bottom: 16px;">System Health</h3>
+        <div id="healthInfo"></div>
+      </div>
+
+      <!-- IPs Tab -->
+      <div class="tab-content" id="ips-tab">
+        <h3 style="margin-bottom: 16px;">Top Violators</h3>
+        <div id="ipTableContainer"></div>
+      </div>
+
+      <!-- Learning Tab -->
+      <div class="tab-content" id="learning-tab">
+        <h3 style="margin-bottom: 16px;">Learning Statistics</h3>
+        <div id="learningInfo"></div>
+      </div>
+
+      <!-- Test Tab -->
+      <div class="tab-content" id="test-tab">
+        <h3 style="margin-bottom: 16px;">Test Email Analysis</h3>
+        <div class="input-group" style="flex-direction: column;">
+          <input type="email" id="testFrom" placeholder="From: sender@example.com">
+          <input type="text" id="testSubject" placeholder="Subject: Test Email">
+          <textarea id="testBody" placeholder="Email body..." style="min-height: 100px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+          <button onclick="testAnalysis()">🧪 Analyze Test Email</button>
+        </div>
+        <div id="testResult" style="margin-top: 20px;"></div>
+      </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="loadDashboard()" title="Refresh Data">🔄</button>
+  </div>
+
+  <script>
+    let API_URL = '';
+    let API_KEY = '';
+
+    // Load saved credentials
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUrl = localStorage.getItem('apiUrl');
+      const savedKey = localStorage.getItem('adminKey');
+      
+      if (savedUrl) document.getElementById('apiUrl').value = savedUrl;
+      if (savedKey) document.getElementById('adminKey').value = savedKey;
+      
+      // Auto-connect if credentials exist
+      if (savedUrl && savedKey) {
+        setTimeout(connect, 500);
+      }
+    });
+
+    async function connect() {
+      const url = document.getElementById('apiUrl').value.trim();
+      const key = document.getElementById('adminKey').value.trim();
+
+      if (!url || !key) {
+        alert('Please enter both API URL and Admin Key');
+        return;
+      }
+
+      API_URL = url.replace(/\/$/, ''); // Remove trailing slash
+      API_KEY = key;
+
+      // Save credentials
+      localStorage.setItem('apiUrl', API_URL);
+      localStorage.setItem('adminKey', API_KEY);
+
+      // Test connection
+      try {
+        const response = await fetch(`${API_URL}/health`);
+        if (!response.ok) throw new Error('API not responding');
+
+        const data = await response.json();
+        
+        // Update status
+        document.getElementById('statusDot').classList.add('connected');
+        document.getElementById('statusText').textContent = `Connected to ${API_URL}`;
+        document.getElementById('statusText').classList.add('connected');
+
+        // Show dashboard
+        document.getElementById('statsGrid').style.display = 'grid';
+        document.getElementById('tabsPanel').style.display = 'block';
+
+        // Load data
+        loadDashboard();
+      } catch (error) {
+        alert('Connection failed: ' + error.message);
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        await Promise.all([
+          loadStats(),
+          loadHealth(),
+          loadSecurityStats(),
+          loadLearningData()
+        ]);
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+      }
+    }
+
+    async function loadStats() {
+      const response = await fetch(`${API_URL}/api/analysis/stats`);
+      const data = await response.json();
+
+      if (data.success) {
+        const stats = data.stats;
+        document.getElementById('totalAnalyzed').textContent = stats.totalAnalyzed || 0;
+        document.getElementById('threatsDetected').textContent = stats.threatsDetected || 0;
+        document.getElementById('trackedIPs').textContent = data.ipReputation?.trackedIPs || 0;
+        document.getElementById('blockedIPs').textContent = data.ipReputation?.blockedIPs || 0;
+        document.getElementById('cacheSize').textContent = stats.cacheSize || 0;
+        document.getElementById('avgRiskScore').textContent = Math.round(stats.averageRiskScore || 0);
+
+        // Calculate threat percentage
+        const threatPercent = stats.totalAnalyzed > 0 
+          ? Math.round((stats.threatsDetected / stats.totalAnalyzed) * 100) 
+          : 0;
+        document.getElementById('threatsChange').textContent = `${threatPercent}% of total`;
+      }
+    }
+
+    async function loadHealth() {
+      const response = await fetch(`${API_URL}/health`);
+      const data = await response.json();
+
+      const html = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div>
+            <strong>Status:</strong> ${data.status === 'ok' ? '✅ Online' : '❌ Offline'}
+          </div>
+          <div>
+            <strong>Version:</strong> ${data.version || 'N/A'}
+          </div>
+          <div>
+            <strong>Uptime:</strong> ${Math.floor(data.uptime / 60)} minutes
+          </div>
+          <div>
+            <strong>Memory:</strong> ${data.memory?.heapUsed || 'N/A'}
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: #f9fafb; border-radius: 8px;">
+          <strong>Rate Limits:</strong><br>
+          <small>
+            Global: ${data.rateLimit?.global || 'N/A'}<br>
+            Analysis: ${data.rateLimit?.analysis || 'N/A'}<br>
+            AI: ${data.rateLimit?.ai || 'N/A'}<br>
+            Batch: ${data.rateLimit?.batch || 'N/A'}
+          </small>
+        </div>
+      `;
+
+      document.getElementById('healthInfo').innerHTML = html;
+    }
+
+    async function loadSecurityStats() {
+      try {
+        const response = await fetch(`${API_URL}/api/admin/security-stats`, {
+          headers: { 'X-API-Key': API_KEY }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Unauthorized - check your admin key');
+        }
+
+        const data = await response.json();
+
+        if (data.topViolators && data.topViolators.length > 0) {
+          const tableHtml = `
+            <table class="ip-table">
+              <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Reputation</th>
+                  <th>Violations</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.topViolators.map(v => `
+                  <tr>
+                    <td><code>${v.ip}</code></td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 100px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+                          <div style="width: ${v.score}%; height: 100%; background: ${v.score > 70 ? '#10b981' : v.score > 40 ? '#f59e0b' : '#ef4444'};"></div>
+                        </div>
+                        <span>${v.score}/100</span>
+                      </div>
+                    </td>
+                    <td>${v.violations}</td>
+                    <td>
+                      ${v.blocked 
+                        ? '<span class="badge blocked">Blocked</span>' 
+                        : v.score < 50 
+                          ? '<span class="badge warning">Warning</span>'
+                          : '<span class="badge good">Good</span>'
+                      }
+                    </td>
+                    <td>
+                      ${v.blocked 
+                        ? `<button class="action-btn success" onclick="unblockIP('${v.ip}')">Unblock</button>`
+                        : `<button class="action-btn" onclick="checkIP('${v.ip}')">Details</button>`
+                      }
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+          document.getElementById('ipTableContainer').innerHTML = tableHtml;
+        } else {
+          document.getElementById('ipTableContainer').innerHTML = '<p>No violators found 🎉</p>';
+        }
+      } catch (error) {
+        document.getElementById('ipTableContainer').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+      }
+    }
+
+    async function loadLearningData() {
+      const response = await fetch(`${API_URL}/api/analysis/learning`);
+      const data = await response.json();
+
+      if (data.success) {
+        const stats = data.stats;
+        const html = `
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px;">
+              <div style="font-size: 32px; font-weight: 800; color: #10b981; margin-bottom: 8px;">
+                ${stats.trustedSenders || 0}
+              </div>
+              <div style="font-size: 14px; color: #6b7280;">Trusted Senders</div>
+            </div>
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px;">
+              <div style="font-size: 32px; font-weight: 800; color: #ef4444; margin-bottom: 8px;">
+                ${stats.suspiciousSenders || 0}
+              </div>
+              <div style="font-size: 14px; color: #6b7280;">Suspicious Senders</div>
+            </div>
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px;">
+              <div style="font-size: 32px; font-weight: 800; color: #667eea; margin-bottom: 8px;">
+                ${stats.trustedDomains || 0}
+              </div>
+              <div style="font-size: 14px; color: #6b7280;">Trusted Domains</div>
+            </div>
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px;">
+              <div style="font-size: 32px; font-weight: 800; color: #f59e0b; margin-bottom: 8px;">
+                ${stats.suspiciousDomains || 0}
+              </div>
+              <div style="font-size: 14px; color: #6b7280;">Suspicious Domains</div>
+            </div>
+          </div>
+        `;
+        document.getElementById('learningInfo').innerHTML = html;
+      }
+    }
+
+    async function unblockIP(ip) {
+      if (!confirm(`Unblock IP ${ip}?`)) return;
+
+      try {
+        const response = await fetch(`${API_URL}/api/admin/unblock/${ip}`, {
+          method: 'POST',
+          headers: { 'X-API-Key': API_KEY }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          alert(`✅ IP ${ip} has been unblocked`);
+          loadSecurityStats();
+        } else {
+          alert('❌ Failed to unblock IP');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function checkIP(ip) {
+      try {
+        const response = await fetch(`${API_URL}/api/admin/ip/${ip}`, {
+          headers: { 'X-API-Key': API_KEY }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          const rep = data.reputation;
+          alert(`IP: ${ip}\n\nReputation Score: ${rep.score}/100\nViolations: ${rep.violations}\nBlocked: ${rep.blocked ? 'Yes' : 'No'}\nLast Violation: ${rep.lastViolation ? new Date(rep.lastViolation).toLocaleString() : 'Never'}`);
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function testAnalysis() {
+      const from = document.getElementById('testFrom').value;
+      const subject = document.getElementById('testSubject').value;
+      const body = document.getElementById('testBody').value;
+
+      if (!from || !subject) {
+        alert('Please enter at least From and Subject');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/analysis/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: { from, subject, body }
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const analysis = data.analysis;
+          const resultHtml = `
+            <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border-left: 4px solid ${
+              analysis.riskLevel === 'high' ? '#ef4444' : 
+              analysis.riskLevel === 'medium' ? '#f59e0b' : '#10b981'
+            };">
+              <h4 style="margin-bottom: 12px;">Analysis Result</h4>
+              <div style="margin-bottom: 8px;"><strong>Risk Level:</strong> ${analysis.riskLevel.toUpperCase()}</div>
+              <div style="margin-bottom: 8px;"><strong>Risk Score:</strong> ${analysis.riskScore}/100</div>
+              <div style="margin-bottom: 8px;"><strong>Confidence:</strong> ${Math.round(analysis.confidence * 100)}%</div>
+              <div style="margin-bottom: 8px;"><strong>Email Type:</strong> ${analysis.emailType}</div>
+              
+              ${analysis.threats && analysis.threats.length > 0 ? `
+                <div style="margin-top: 16px;">
+                  <strong>Threats Detected:</strong>
+                  <ul style="margin-top: 8px; padding-left: 20px;">
+                    ${analysis.threats.map(t => `<li>${t.type} (${t.severity}): ${t.detail}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : '<div style="margin-top: 16px; color: #10b981;"><strong>✅ No threats detected</strong></div>'}
+            </div>
+          `;
+          document.getElementById('testResult').innerHTML = resultHtml;
+        } else {
+          document.getElementById('testResult').innerHTML = `<div class="error">❌ ${data.error}</div>`;
+        }
+      } catch (error) {
+        document.getElementById('testResult').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+      }
+    }
+
+    function switchTab(tabName) {
+      // Update buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Update content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      if (API_URL && API_KEY) {
+        loadDashboard();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
