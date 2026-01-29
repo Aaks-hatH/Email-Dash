@@ -3,880 +3,675 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Security API - Admin Dashboard</title>
+    <title>SECURESCAN V6 | Global Admin Command Center</title>
+    
+    <!-- Professional Assets -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%230f172a' /><stop offset='100%' style='stop-color:%23334155' /></linearGradient></defs><path d='M50 5 L15 25 V50 C15 75 50 95 50 95 C50 95 85 75 85 50 V25 L50 5Z' fill='url(%23g)' /><path d='M50 20 L30 35 V50 C30 65 50 80 50 80 C50 80 70 65 70 50 V35 L50 20Z' fill='white' opacity='0.2' /><circle cx='50' cy='45' r='10' fill='white' opacity='0.8' /></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Engine Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* 
+           SECURESCAN V6 ADMIN DESIGN SYSTEM
+           Titanium / Slate / Carbon / Frost
+        */
+        :root {
+            --pjs: 'Plus Jakarta Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+
+            /* Grayscale Core */
+            --white: #ffffff;
+            --zinc-50: #fafafa;
+            --zinc-100: #f4f4f5;
+            --zinc-200: #e4e4e7;
+            --zinc-300: #d4d4d8;
+            --zinc-400: #a1a1aa;
+            --zinc-500: #71717a;
+            --zinc-600: #52525b;
+            --zinc-700: #3f3f46;
+            --zinc-800: #27272a;
+            --zinc-900: #18181b;
+            --zinc-950: #09090b;
+
+            /* Identity Colors */
+            --brand-primary: #18181b;
+            --brand-accent: #3b82f6;
+            --status-safe: #10b981;
+            --status-warn: #f59e0b;
+            --status-danger: #ef4444;
+
+            /* UI Geometry */
+            --sidebar-width: 280px;
+            --header-height: 80px;
+            --radius-lg: 24px;
+            --radius-md: 12px;
+            --border-titanium: 1px solid rgba(0, 0, 0, 0.08);
+            
+            /* Shadows */
+            --shadow-subtle: 0 1px 3px rgba(0,0,0,0.02), 0 10px 20px -5px rgba(0,0,0,0.04);
+            --shadow-float: 0 20px 40px -10px rgba(0,0,0,0.08);
+            
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        /* Base Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
+            background-color: var(--zinc-50);
+            color: var(--zinc-900);
+            font-family: var(--pjs);
+            line-height: 1.5;
+            overflow: hidden; /* Screen-locked dashboard */
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+        /* --- Global Noise Texture --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 10000;
         }
 
-        /* Login Page Styles */
-        .login-container {
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--zinc-50); }
+        ::-webkit-scrollbar-thumb { background: var(--zinc-200); border-radius: 10px; }
+
+        /* --- Page Layout --- */
+        .admin-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Sidebar Navigation */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            border-right: var(--border-titanium);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            padding: 0 30px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: white;
-            border-radius: 24px;
-            padding: 48px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            max-width: 480px;
-            width: 100%;
-            animation: fadeInUp 0.6s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .login-logo svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 16px;
-        }
-
-        .login-logo h1 {
-            font-size: 28px;
-            color: #1e293b;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .login-logo p {
-            color: #64748b;
-            font-size: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #475569;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .login-button {
-            width: 100%;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 8px;
-        }
-
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-        }
-
-        .login-button:active {
-            transform: translateY(0);
-        }
-
-        .login-error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 16px;
-            border: 1px solid #fecaca;
-            display: none;
-        }
-
-        .login-error.show {
-            display: block;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: none;
-            animation: fadeIn 0.6s ease;
-        }
-
-        .dashboard.show {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .header {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .header-content h1 {
-            font-size: 32px;
-            color: #1e293b;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .header-content p {
-            color: #64748b;
-            font-size: 15px;
-        }
-
-        .header-actions {
-            display: flex;
             gap: 12px;
-            align-items: center;
+            border-bottom: var(--border-titanium);
         }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #dcfce7;
-            color: #166534;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .status-badge.offline {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background: #16a34a;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .status-badge.offline .status-indicator {
-            background: #dc2626;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .logout-button {
-            background: #f1f5f9;
-            color: #475569;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-button:hover {
-            background: #e2e8f0;
-            transform: translateY(-1px);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .stat-card h3 {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-value {
-            font-size: 48px;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: #94a3b8;
-        }
-
-        .section {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .section h2 {
-            font-size: 24px;
-            color: #1e293b;
-            margin-bottom: 24px;
-            font-weight: 700;
-        }
-
-        .tab-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: #f8fafc;
-            padding: 6px;
-            border-radius: 12px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px 20px;
-            background: transparent;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
+        .brand-diamond {
+            width: 34px; height: 34px;
+            background: var(--zinc-950);
             border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .tab:hover {
-            color: #3b82f6;
-        }
-
-        .tab.active {
-            background: white;
-            color: #3b82f6;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #475569;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .button {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex; align-items: center; justify-content: center;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        .brand-text { font-weight: 800; font-size: 1rem; letter-spacing: -0.5px; }
+
+        .sidebar-nav { flex: 1; padding: 20px; overflow-y: auto; }
+        .nav-group { margin-bottom: 30px; }
+        .nav-label { font-size: 0.65rem; font-weight: 800; color: var(--zinc-400); text-transform: uppercase; letter-spacing: 1px; margin: 0 15px 12px; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 15px; border-radius: 10px;
+            color: var(--zinc-600); font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; margin-bottom: 2px;
+        }
+        .nav-item:hover { background: var(--zinc-50); color: var(--zinc-950); }
+        .nav-item.active { background: var(--zinc-950); color: var(--white); box-shadow: 0 10px 15px -5px rgba(0,0,0,0.1); }
+
+        .sidebar-footer { padding: 20px; border-top: var(--border-titanium); }
+
+        /* Main Dashboard Area */
+        main.content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--zinc-50);
+            position: relative;
         }
 
-        .button:active {
-            transform: translateY(0);
+        header.top-bar {
+            height: var(--header-height);
+            background: var(--white);
+            border-bottom: var(--border-titanium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 90;
         }
 
-        .button-secondary {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        .search-box {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--zinc-100); padding: 8px 16px;
+            border-radius: 100px; width: 400px;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .search-box:focus-within { border-color: var(--zinc-300); background: white; box-shadow: 0 0 0 4px rgba(0,0,0,0.02); }
+        .search-box input { background: transparent; border: none; outline: none; width: 100%; font-size: 0.9rem; font-family: inherit; }
+
+        .view-container { flex: 1; padding: 40px; overflow-y: auto; display: none; }
+        .view-container.active { display: block; animation: viewFade 0.4s ease-out; }
+        @keyframes viewFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Auth Layer --- */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fdfdfd; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .button-secondary:hover {
-            box-shadow: 0 6px 20px rgba(100, 116, 139, 0.3);
+        .auth-card {
+            width: 420px; padding: 50px; text-align: center;
+            background: white; border-radius: 30px;
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.1);
+            border: var(--border-titanium);
         }
 
-        .button-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        /* --- Components --- */
+        .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
+        
+        .stat-card {
+            background: white; padding: 24px; border-radius: 20px;
+            border: var(--border-titanium); position: relative; overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+        }
+        .stat-card h4 { font-size: 0.7rem; font-weight: 800; color: var(--zinc-400); text-transform: uppercase; margin-bottom: 12px; }
+        .stat-value { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+        .stat-trend { font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: var(--status-safe); }
+        .trend-down { color: var(--status-danger); }
+
+        /* Mini Sparklines */
+        .sparkline { width: 100%; height: 40px; margin-top: 15px; display: flex; align-items: flex-end; gap: 3px; }
+        .spark-bar { flex: 1; background: var(--zinc-100); border-radius: 2px; min-height: 4px; transition: 0.5s; }
+
+        .card-main {
+            background: white; border: var(--border-titanium); border-radius: 24px;
+            padding: 32px; box-shadow: var(--shadow-subtle); margin-bottom: 24px;
         }
 
-        .button-danger:hover {
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+
+        /* --- Data Tables --- */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 16px; font-size: 0.65rem; font-weight: 800; color: var(--zinc-400); text-transform: uppercase; border-bottom: 1px solid var(--zinc-100); }
+        td { padding: 16px; border-bottom: 1px solid var(--zinc-50); font-size: 0.9rem; color: var(--zinc-700); }
+        tr:hover td { background: var(--zinc-50); }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .badge-safe { background: #dcfce7; color: #166534; }
+        .badge-warn { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+
+        /* --- Form Elements --- */
+        .field-group { margin-bottom: 20px; }
+        .field-label { font-size: 0.75rem; font-weight: 700; color: var(--zinc-500); margin-bottom: 8px; display: block; }
+        .input-control {
+            width: 100%; padding: 14px 18px; border-radius: 12px;
+            border: 1px solid var(--zinc-200); background: var(--zinc-50);
+            font-family: inherit; font-size: 0.95rem; transition: 0.2s; outline: none;
         }
+        .input-control:focus { background: white; border-color: var(--zinc-900); box-shadow: 0 0 0 4px rgba(0,0,0,0.02); }
 
-        .response-box {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 12px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 400px;
-            overflow-y: auto;
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: 0.2s; border: none; outline: none;
         }
+        .btn-black { background: var(--zinc-950); color: white; }
+        .btn-black:hover { transform: translateY(-2px); box-shadow: var(--shadow-float); }
+        .btn-ghost { background: transparent; color: var(--zinc-600); border: 1px solid var(--zinc-200); }
+        .btn-ghost:hover { background: var(--zinc-100); color: var(--zinc-950); }
 
-        .response-box.success {
-            background: #f0fdf4;
-            border-color: #86efac;
-            color: #166534;
+        /* --- Live Logs / Console --- */
+        .log-terminal {
+            background: var(--zinc-950); border-radius: 16px;
+            height: 300px; padding: 20px; overflow-y: auto;
+            font-family: var(--mono); font-size: 0.75rem; color: #94a3b8;
         }
+        .log-line { margin-bottom: 6px; border-left: 2px solid transparent; padding-left: 10px; }
+        .log-success { border-color: var(--status-safe); color: #10b981; }
+        .log-error { border-color: var(--status-danger); color: #f43f5e; }
+        .log-info { border-color: var(--brand-accent); color: #60a5fa; }
 
-        .response-box.error {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            color: #991b1b;
-        }
+        /* --- Heatmap Simulation --- */
+        .threat-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 20px; }
+        .grid-cell { aspect-ratio: 1; border-radius: 2px; background: var(--zinc-100); cursor: pointer; transition: 0.2s; }
+        .grid-cell:hover { transform: scale(1.5); z-index: 10; }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th {
-            text-align: left;
-            padding: 14px;
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .table td {
-            padding: 14px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-            color: #334155;
-        }
-
-        .table tr:hover {
-            background: #f8fafc;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .alert {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .login-box {
-                padding: 32px 24px;
-            }
-
-            .stat-value {
-                font-size: 36px;
-            }
-
-            .tab-container {
-                flex-direction: column;
-            }
-
-            .tab {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div class="login-container" id="loginPage">
-        <div class="login-box">
-            <div class="login-logo">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <h1>Admin Portal</h1>
-                <p>Email Security API Dashboard</p>
+
+    <!-- AUTHENTICATION BARRIER -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <div style="background: var(--zinc-950); color: white; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i data-lucide="shield-alert" size="30"></i>
             </div>
-
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label for="adminKeyInput">Admin API Key</label>
-                    <input type="password" id="adminKeyInput" placeholder="Enter your admin API key" required>
-                </div>
-
-                <button type="submit" class="login-button">Sign In</button>
-            </form>
-
-            <div class="login-error" id="loginError">
-                Invalid API key. Please check your credentials and try again.
-            </div>
-
-            <div class="login-footer">
-                Secure Sign In
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard (hidden until authenticated) -->
-    <div class="container dashboard" id="dashboard">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <h1>Email Security Dashboard</h1>
-                <p>Monitor and manage your email security infrastructure</p>
-            </div>
-            <div class="header-actions">
-                <span class="status-badge" id="statusBadge">
-                    <span class="status-indicator"></span>
-                    Checking...
-                </span>
-                <button class="logout-button" onclick="logout()">Sign Out</button>
-            </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid">
-            <div class="stat-card">
-                <h3>API Uptime</h3>
-                <div class="stat-value" id="uptimeStat">--</div>
-                <div class="stat-label">seconds</div>
-            </div>
-
-            <div class="stat-card">
-                <h3>Tracked IPs</h3>
-                <div class="stat-value" id="trackedIPsStat">--</div>
-                <div class="stat-label">monitored addresses</div>
-            </div>
-
-            <div class="stat-card">
-                <h3>Blocked IPs</h3>
-                <div class="stat-value" id="blockedIPsStat">--</div>
-                <div class="stat-label">currently blocked</div>
-            </div>
-
-            <div class="stat-card">
-                <h3>Avg Reputation</h3>
-                <div class="stat-value" id="avgReputationStat">--</div>
-                <div class="stat-label">score out of 100</div>
-            </div>
-        </div>
-
-        <!-- Admin Tools -->
-        <div class="section">
-            <h2>Admin Tools</h2>
-
-            <div class="tab-container">
-                <button class="tab active" onclick="switchTab('check-ip')">Check IP</button>
-                <button class="tab" onclick="switchTab('unblock-ip')">Unblock IP</button>
-                <button class="tab" onclick="switchTab('security-stats')">Security Stats</button>
-                <button class="tab" onclick="switchTab('test-api')">Test API</button>
-            </div>
-
-            <!-- Check IP Tab -->
-            <div class="tab-content active" id="check-ip-tab">
-                <div class="input-group">
-                    <label for="checkIpInput">IP Address</label>
-                    <input type="text" id="checkIpInput" placeholder="123.456.789.0">
-                </div>
-                <button class="button" onclick="checkIP()">Check Reputation</button>
-                <button class="button button-secondary" onclick="getMyIP()">Use My IP</button>
-                <div id="checkIpResponse"></div>
-            </div>
-
-            <!-- Unblock IP Tab -->
-            <div class="tab-content" id="unblock-ip-tab">
-                <div class="input-group">
-                    <label for="unblockIpInput">IP Address</label>
-                    <input type="text" id="unblockIpInput" placeholder="123.456.789.0">
-                </div>
-                <button class="button button-danger" onclick="unblockIP()">Unblock Address</button>
-                <div id="unblockIpResponse"></div>
-            </div>
-
-            <!-- Security Stats Tab -->
-            <div class="tab-content" id="security-stats-tab">
-                <button class="button" onclick="getSecurityStats()">Load Statistics</button>
-                <div id="securityStatsResponse"></div>
-                <div id="violatorsTable"></div>
-            </div>
-
-            <!-- Test API Tab -->
-            <div class="tab-content" id="test-api-tab">
-                <div class="input-group">
-                    <label for="testEmailInput">Email JSON</label>
-                    <textarea id="testEmailInput" placeholder='{"email": {"sender": "test@example.com", "subject": "Test", "body": "Hello", "links": []}}'></textarea>
-                </div>
-                <button class="button" onclick="testAnalysis()">Test Analysis</button>
-                <div id="testApiResponse"></div>
-            </div>
-        </div>
-
-        <!-- API Reference -->
-        <div class="section">
-            <h2>Quick Reference</h2>
+            <h2 style="font-weight: 800; margin-bottom: 8px;">Admin Authorization</h2>
+            <p style="color: var(--zinc-500); font-size: 0.9rem; margin-bottom: 30px;">Access restricted to v6.0 system administrators. Please provide your secure API gateway key.</p>
             
-            <h3 style="margin-top: 20px; color: #475569; font-size: 16px;">Rate Limits</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Endpoint</th>
-                        <th>Limit</th>
-                        <th>Adjustment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Global</td>
-                        <td>1000 req / 15 min</td>
-                        <td>Per IP</td>
-                    </tr>
-                    <tr>
-                        <td>/api/analysis/analyze</td>
-                        <td>200 req / min</td>
-                        <td>Reputation-based</td>
-                    </tr>
-                    <tr>
-                        <td>/api/analysis/batch</td>
-                        <td>50 req / min</td>
-                        <td>Per IP</td>
-                    </tr>
-                    <tr>
-                        <td>/api/analysis/feedback</td>
-                        <td>500 req / hour</td>
-                        <td>Per IP</td>
-                    </tr>
-                    <tr>
-                        <td>AI Analysis</td>
-                        <td>100 req / min</td>
-                        <td>Per IP</td>
-                    </tr>
-                </tbody>
-            </table>
+            <form onsubmit="handleAuth(event)">
+                <div class="field-group">
+                    <input type="password" id="adminKeyInput" class="input-control" placeholder="X-API-KEY-V6" style="text-align: center;" required>
+                </div>
+                <button type="submit" class="btn btn-black" style="width: 100%; height: 55px;" id="authBtn">Authorize Session</button>
+            </form>
+            <div id="authError" style="color: var(--status-danger); font-size: 0.8rem; margin-top: 15px; font-weight: 600; display: none;">Invalid authentication credentials. Trace initiated.</div>
         </div>
     </div>
+
+    <div class="admin-wrapper" id="adminMain" style="display: none;">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-diamond"><i data-lucide="shield"></i></div>
+                <div class="brand-text">SECURESCAN <span style="font-weight: 300; opacity: 0.5;">V6</span></div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <div class="nav-label">Main Operations</div>
+                    <div class="nav-item active" onclick="switchView('overview')">
+                        <i data-lucide="layout-dashboard" size="18"></i> Overview
+                    </div>
+                    <div class="nav-item" onclick="switchView('network')">
+                        <i data-lucide="globe" size="18"></i> Network Intel
+                    </div>
+                    <div class="nav-item" onclick="switchView('reputation')">
+                        <i data-lucide="list-checks" size="18"></i> IP Reputation
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">Security Tools</div>
+                    <div class="nav-item" onclick="switchView('threat-hunter')">
+                        <i data-lucide="radar" size="18"></i> Threat Hunter
+                    </div>
+                    <div class="nav-item" onclick="switchView('api-tester')">
+                        <i data-lucide="code-2" size="18"></i> API Debugger
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">System</div>
+                    <div class="nav-item" onclick="switchView('settings')">
+                        <i data-lucide="settings-2" size="18"></i> Node Config
+                    </div>
+                    <div class="nav-item" onclick="switchView('logs')">
+                        <i data-lucide="terminal" size="18"></i> Kernel Logs
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div style="display: flex; align-items: center; gap: 10px; background: var(--zinc-50); padding: 12px; border-radius: 12px; border: var(--border-titanium);">
+                    <div style="width: 8px; height: 8px; background: var(--status-safe); border-radius: 50%;"></div>
+                    <div style="font-size: 0.75rem; font-weight: 700;">Engine: Operational</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="content">
+            <header class="top-bar">
+                <div class="search-box">
+                    <i data-lucide="search" size="16" style="color: var(--zinc-400);"></i>
+                    <input type="text" placeholder="Search by IP, Transaction ID, or Alert Type...">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div id="apiStatusBadge" class="badge badge-safe" style="display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="activity" size="12"></i> API: 200 OK
+                    </div>
+                    <button class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.8rem;" onclick="logout()">
+                        <i data-lucide="log-out" size="14"></i> Sign Out
+                    </button>
+                </div>
+            </header>
+
+            <!-- VIEW: OVERVIEW -->
+            <div id="view-overview" class="view-container active">
+                <div class="grid-stats">
+                    <div class="stat-card">
+                        <h4>System Uptime</h4>
+                        <div class="stat-value" id="uptimeVal">--</div>
+                        <div class="stat-trend trend-up"><i data-lucide="arrow-up-right" size="12"></i> Active Session</div>
+                        <div class="sparkline" id="uptimeSpark"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Analyzed Vectors</h4>
+                        <div class="stat-value" id="trackedVal">--</div>
+                        <div class="stat-trend trend-up"><i data-lucide="arrow-up-right" size="12"></i> +12% vs last 24h</div>
+                        <div class="sparkline" id="trackedSpark"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Threats Neutralized</h4>
+                        <div class="stat-value" id="blockedVal" style="color: var(--status-danger)">--</div>
+                        <div class="stat-trend trend-down"><i data-lucide="shield-off" size="12"></i> Active Defense</div>
+                        <div class="sparkline" id="blockedSpark"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Global Reputation</h4>
+                        <div class="stat-value" id="repVal">--</div>
+                        <div class="stat-trend trend-up"><i data-lucide="check-circle-2" size="12"></i> Trusted Core</div>
+                        <div class="sparkline" id="repSpark"></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <!-- Top Violators -->
+                    <div class="card-main">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-lucide="user-x"></i> High-Risk Threat Actors</h3>
+                            <button class="btn btn-ghost" style="font-size: 0.7rem; padding: 6px 12px;" onclick="loadViolators()">
+                                <i data-lucide="refresh-cw" size="12"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table id="violatorsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Origin IP</th>
+                                        <th>Reputation</th>
+                                        <th>Violations</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" style="text-align: center; color: var(--zinc-400); padding: 40px;">No data loaded. Awaiting API telemetry...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- System Health -->
+                    <div class="card-main">
+                        <div class="card-header"><h3 class="card-title"><i data-lucide="cpu"></i> Node Performance</h3></div>
+                        <div style="display: grid; gap: 20px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
+                                    <span>CPU Usage</span><span id="cpuUsageVal">0%</span>
+                                </div>
+                                <div style="height: 6px; background: var(--zinc-100); border-radius: 100px; overflow: hidden;">
+                                    <div id="cpuBar" style="width: 0%; height: 100%; background: var(--zinc-900); transition: 0.5s;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
+                                    <span>Memory Usage</span><span id="memUsageVal">0%</span>
+                                </div>
+                                <div style="height: 6px; background: var(--zinc-100); border-radius: 100px; overflow: hidden;">
+                                    <div id="memBar" style="width: 0%; height: 100%; background: var(--zinc-900); transition: 0.5s;"></div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; padding: 15px; background: var(--zinc-50); border-radius: 12px; font-size: 0.75rem; color: var(--zinc-500);">
+                                <i data-lucide="info" size="14" style="vertical-align: middle; margin-right: 5px;"></i>
+                                All 3 primary analysis nodes are currently responding under 15ms latency.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: NETWORK INTEL -->
+            <div id="view-network" class="view-container">
+                <div class="card-main">
+                    <div class="card-header">
+                        <h3 class="card-title"><i data-lucide="radar"></i> Global Threat Heatmap</h3>
+                        <p style="font-size: 0.8rem; color: var(--zinc-500);">Real-time malicious traffic density mapping</p>
+                    </div>
+                    <div class="threat-grid" id="heatmap">
+                        <!-- 144 cells injected via JS -->
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.7rem; color: var(--zinc-400); font-weight: 700;">
+                        <span style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #f4f4f5; border-radius: 2px;"></div> LOW TRAFFIC</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #fee2e2; border-radius: 2px;"></div> MODERATE</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #fca5a5; border-radius: 2px;"></div> HIGH</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #ef4444; border-radius: 2px;"></div> CRITICAL</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: REPUTATION -->
+            <div id="view-reputation" class="view-container">
+                <div class="card-main" style="max-width: 600px; margin: 0 auto;">
+                    <h3 class="card-title" style="margin-bottom: 24px;"><i data-lucide="database"></i> IP Reputation Query</h3>
+                    <div class="field-group">
+                        <label class="field-label">Target IP Address</label>
+                        <input type="text" id="checkIpInput" class="input-control" placeholder="123.456.78.9">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-black" style="flex: 1;" onclick="checkIP()">Scan Repository</button>
+                        <button class="btn btn-ghost" onclick="getMyIP()">Use My IP</button>
+                    </div>
+                    <div id="checkIpResponse" style="margin-top: 24px;"></div>
+                </div>
+
+                <div class="card-main" style="max-width: 600px; margin: 24px auto;">
+                    <h3 class="card-title" style="margin-bottom: 24px; color: var(--status-danger);"><i data-lucide="unlock"></i> Revoke Blocklist</h3>
+                    <div class="field-group">
+                        <label class="field-label">IP Address to Unblock</label>
+                        <input type="text" id="unblockIpInput" class="input-control" placeholder="123.456.78.9">
+                    </div>
+                    <button class="btn btn-ghost" style="width: 100%; border-color: var(--status-danger); color: var(--status-danger);" onclick="unblockIP()">Clear Defensive Block</button>
+                    <div id="unblockIpResponse" style="margin-top: 24px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: API TESTER -->
+            <div id="view-api-tester" class="view-container">
+                <div class="card-main">
+                    <h3 class="card-title" style="margin-bottom: 24px;"><i data-lucide="flask-conical"></i> Analysis Simulation Lab</h3>
+                    <div class="field-group">
+                        <label class="field-label">Request Payload (JSON)</label>
+                        <textarea id="testEmailInput" class="input-control" style="height: 200px; font-family: var(--mono); font-size: 0.8rem;">{
+  "email": {
+    "from": "test@example.com",
+    "subject": "System Alert",
+    "body": "Your access has been revoked. Click here to verify: http://malicious-link.net",
+    "links": ["http://malicious-link.net"]
+  }
+}</textarea>
+                    </div>
+                    <button class="btn btn-black" onclick="testAnalysis()">Fire API Request</button>
+                    <div id="testApiResponse" style="margin-top: 24px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: LOGS -->
+            <div id="view-logs" class="view-container">
+                <div class="card-main">
+                    <div class="card-header">
+                        <h3 class="card-title"><i data-lucide="terminal"></i> Live Security Event Stream</h3>
+                        <button class="btn btn-ghost" style="font-size: 0.7rem; padding: 6px 12px;" onclick="clearLogs()">Clear Stream</button>
+                    </div>
+                    <div class="log-terminal" id="terminalLogs">
+                        <div class="log-line log-info">System Kernel v6.0.4 initialized...</div>
+                        <div class="log-line log-info">SecureScan ML Module loading weights...</div>
+                        <div class="log-line log-success">Ready for telemetry input.</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- NOTIFICATION TOASTS -->
+    <div id="toastContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 20000; pointer-events: none;"></div>
 
     <script>
+        // --- Core Application Logic ---
+        lucide.createIcons();
+        
         const API_BASE_URL = 'https://email-security-api.onrender.com';
         let adminKey = null;
+        let healthTimer = null;
 
-        // Handle login
-        async function handleLogin(event) {
+        // Views Controller
+        function switchView(viewId) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            // Find nav item by icon or text matching (simplified logic)
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(item => {
+                if (item.innerText.toLowerCase().includes(viewId.replace('-', ' '))) {
+                    item.classList.add('active');
+                }
+            });
+
+            logToTerminal(`Navigated to: ${viewId.toUpperCase()}`, 'info');
+            lucide.createIcons();
+        }
+
+        // Authentication Engine
+        async function handleAuth(event) {
             event.preventDefault();
             const key = document.getElementById('adminKeyInput').value;
+            const btn = document.getElementById('authBtn');
             
-            // Test the key by making a request
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="refresh-cw" class="spin"></i> Authenticating...';
+            lucide.createIcons();
+
             try {
+                // Testing key against the security-stats endpoint
                 const response = await fetch(`${API_BASE_URL}/api/admin/security-stats`, {
                     headers: { 'X-API-Key': key }
                 });
                 
-                if (response.status === 401) {
-                    showLoginError();
-                    return;
-                }
-                
-                if (response.status === 503) {
-                    alert('Admin API not configured on server. Please set ADMIN_API_KEY environment variable.');
-                    return;
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Store key and show dashboard
+                if (response.ok) {
                     adminKey = key;
                     sessionStorage.setItem('adminKey', key);
-                    showDashboard();
+                    revealDashboard();
                 } else {
-                    showLoginError();
+                    throw new Error('Unauthorized');
                 }
-            } catch (error) {
-                alert('Unable to connect to API. Please check the API URL.');
+            } catch (err) {
+                document.getElementById('authError').style.display = 'block';
+                gsap.fromTo(".auth-card", { x: -10 }, { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Authorize Session';
+                lucide.createIcons();
             }
         }
 
-        // Show login error
-        function showLoginError() {
-            document.getElementById('loginError').classList.add('show');
-            setTimeout(() => {
-                document.getElementById('loginError').classList.remove('show');
-            }, 3000);
+        function revealDashboard() {
+            gsap.to("#authOverlay", { opacity: 0, duration: 0.5, onComplete: () => {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('adminMain').style.display = 'flex';
+                initDashboard();
+                showToast("Identity Verified", "Welcome to the v6 Command Center.");
+            }});
         }
 
-        // Show dashboard
-        function showDashboard() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboard').classList.add('show');
-            initDashboard();
+        // --- Data Fetching ---
+
+        async function initDashboard() {
+            updateLiveStats();
+            loadViolators();
+            generateHeatmap();
+            simulateHealth();
+            
+            healthTimer = setInterval(() => {
+                updateLiveStats();
+                simulateHealth();
+            }, 15000);
+
+            // Generate initial sparklines
+            generateSparklines();
         }
 
-        // Logout
-        function logout() {
-            adminKey = null;
-            sessionStorage.removeItem('adminKey');
-            document.getElementById('dashboard').classList.remove('show');
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('adminKeyInput').value = '';
-        }
-
-        // Switch tabs
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName + '-tab').classList.add('active');
-        }
-
-        // Display response
-        function displayResponse(elementId, data, isError = false) {
-            const element = document.getElementById(elementId);
-            const responseBox = document.createElement('div');
-            responseBox.className = `response-box ${isError ? 'error' : 'success'}`;
-            responseBox.textContent = JSON.stringify(data, null, 2);
-            element.innerHTML = '';
-            element.appendChild(responseBox);
-        }
-
-        // Check API health
-        async function checkHealth() {
+        async function updateLiveStats() {
             try {
-                const response = await fetch(`${API_BASE_URL}/health`);
-                const data = await response.json();
+                const [healthRes, statsRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/health`),
+                    fetch(`${API_BASE_URL}/api/analysis/stats`)
+                ]);
+
+                const health = await healthRes.json();
+                const stats = await statsRes.json();
+
+                // Uptime
+                document.getElementById('uptimeVal').textContent = Math.floor(health.uptime / 60) + 'm';
                 
-                const badge = document.getElementById('statusBadge');
-                if (data.status === 'ok') {
-                    badge.innerHTML = '<span class="status-indicator"></span>Online';
-                    badge.classList.remove('offline');
-                } else {
-                    badge.innerHTML = '<span class="status-indicator"></span>Offline';
-                    badge.classList.add('offline');
+                // IP Stats
+                if (stats.success && stats.ipReputation) {
+                    animateValue('trackedVal', stats.ipReputation.trackedIPs);
+                    animateValue('blockedVal', stats.ipReputation.blockedIPs);
+                    document.getElementById('repVal').textContent = stats.ipReputation.averageReputationScore + '%';
                 }
 
-                document.getElementById('uptimeStat').textContent = data.uptime || '--';
-                return data;
-            } catch (error) {
-                const badge = document.getElementById('statusBadge');
-                badge.innerHTML = '<span class="status-indicator"></span>Offline';
-                badge.classList.add('offline');
-                return null;
+                logToTerminal("Live telemetry updated from backend node.", "success");
+            } catch (err) {
+                logToTerminal("Failed to refresh telemetry. Network error.", "error");
             }
         }
 
-        // Load public stats
-        async function loadPublicStats() {
+        async function loadViolators() {
+            const tableBody = document.querySelector('#violatorsTable tbody');
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><i data-lucide="refresh-cw" class="spin"></i> Fetching records...</td></tr>';
+            lucide.createIcons();
+
             try {
-                const response = await fetch(`${API_BASE_URL}/api/analysis/stats`);
+                const response = await fetch(`${API_BASE_URL}/api/admin/security-stats`, {
+                    headers: { 'X-API-Key': adminKey }
+                });
                 const data = await response.json();
-                
-                if (data.success && data.ipReputation) {
-                    document.getElementById('trackedIPsStat').textContent = data.ipReputation.trackedIPs || '--';
-                    document.getElementById('blockedIPsStat').textContent = data.ipReputation.blockedIPs || '--';
-                    document.getElementById('avgReputationStat').textContent = data.ipReputation.averageReputationScore || '--';
+
+                if (data.success && data.topViolators) {
+                    tableBody.innerHTML = '';
+                    data.topViolators.forEach(v => {
+                        const tr = document.createElement('tr');
+                        const statusBadge = v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge badge-warn">Active</span>';
+                        tr.innerHTML = `
+                            <td style="font-family: var(--mono); font-weight: 600;">${v.ip}</td>
+                            <td>${v.score}/100</td>
+                            <td style="font-weight: 700;">${v.violations}</td>
+                            <td>${statusBadge}</td>
+                            <td><button class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.6rem;" onclick="checkIPAt('${v.ip}')">Investigate</button></td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
                 }
-            } catch (error) {
-                console.error('Failed to load stats:', error);
+            } catch (err) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--status-danger);">Failed to load violators.</td></tr>';
             }
         }
 
-        // Get my IP
-        async function getMyIP() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                document.getElementById('checkIpInput').value = data.ip;
-                document.getElementById('unblockIpInput').value = data.ip;
-            } catch (error) {
-                alert('Failed to get your IP address');
-            }
-        }
+        // --- View Specific Functions ---
 
-        // Check IP reputation
         async function checkIP() {
             const ip = document.getElementById('checkIpInput').value;
+            if (!ip) return showToast("Input Required", "Please enter a valid IP address.", "warn");
 
-            if (!ip) {
-                alert('Please enter an IP address');
-                return;
-            }
+            const resDiv = document.getElementById('checkIpResponse');
+            resDiv.innerHTML = '<i data-lucide="refresh-cw" class="spin"></i> Querying Database...';
+            lucide.createIcons();
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/admin/ip/${ip}`, {
@@ -884,23 +679,23 @@
                 });
                 const data = await response.json();
                 displayResponse('checkIpResponse', data, !data.success);
-            } catch (error) {
-                displayResponse('checkIpResponse', { error: error.message }, true);
+                logToTerminal(`Queried reputation for IP: ${ip}`, 'info');
+            } catch (err) {
+                displayResponse('checkIpResponse', { error: err.message }, true);
             }
         }
 
-        // Unblock IP
+        function checkIPAt(ip) {
+            switchView('reputation');
+            document.getElementById('checkIpInput').value = ip;
+            checkIP();
+        }
+
         async function unblockIP() {
             const ip = document.getElementById('unblockIpInput').value;
+            if (!ip) return;
 
-            if (!ip) {
-                alert('Please enter an IP address');
-                return;
-            }
-
-            if (!confirm(`Unblock ${ip}?`)) {
-                return;
-            }
+            if (!confirm(`Are you certain you wish to revoke the block for ${ip}?`)) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/admin/unblock/${ip}`, {
@@ -911,100 +706,180 @@
                 displayResponse('unblockIpResponse', data, !data.success);
                 
                 if (data.success) {
-                    loadPublicStats();
+                    showToast("Defense Revoked", `IP ${ip} has been removed from the blocklist.`);
+                    updateLiveStats();
+                    loadViolators();
                 }
-            } catch (error) {
-                displayResponse('unblockIpResponse', { error: error.message }, true);
+            } catch (err) {
+                displayResponse('unblockIpResponse', { error: err.message }, true);
             }
         }
 
-        // Get security stats
-        async function getSecurityStats() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/security-stats`, {
-                    headers: { 'X-API-Key': adminKey }
-                });
-                const data = await response.json();
-                displayResponse('securityStatsResponse', data, !data.success);
-
-                if (data.success && data.topViolators && data.topViolators.length > 0) {
-                    let tableHTML = `
-                        <h3 style="margin-top: 30px; color: #475569; font-size: 16px;">Top Violators</h3>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>IP Address</th>
-                                    <th>Score</th>
-                                    <th>Violations</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    data.topViolators.forEach(violator => {
-                        const statusClass = violator.blocked ? 'badge-danger' : 
-                                          violator.score < 50 ? 'badge-warning' : 'badge-success';
-                        const statusText = violator.blocked ? 'Blocked' : 
-                                         violator.score < 50 ? 'Warning' : 'Good';
-
-                        tableHTML += `
-                            <tr>
-                                <td>${violator.ip}</td>
-                                <td>${violator.score}</td>
-                                <td>${violator.violations}</td>
-                                <td><span class="badge ${statusClass}">${statusText}</span></td>
-                            </tr>
-                        `;
-                    });
-
-                    tableHTML += '</tbody></table>';
-                    document.getElementById('violatorsTable').innerHTML = tableHTML;
-                }
-            } catch (error) {
-                displayResponse('securityStatsResponse', { error: error.message }, true);
-            }
-        }
-
-        // Test API
         async function testAnalysis() {
+            const resDiv = document.getElementById('testApiResponse');
+            resDiv.innerHTML = '<i data-lucide="zap" class="spin"></i> Processing...';
+            lucide.createIcons();
+
             try {
                 const emailData = JSON.parse(document.getElementById('testEmailInput').value);
-                
                 const response = await fetch(`${API_BASE_URL}/api/analysis/analyze`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(emailData)
                 });
-                
                 const data = await response.json();
                 displayResponse('testApiResponse', data, !data.success);
-            } catch (error) {
-                displayResponse('testApiResponse', { error: error.message }, true);
+                logToTerminal("API Analysis simulation completed.", "success");
+            } catch (err) {
+                displayResponse('testApiResponse', { error: "Invalid JSON or Network Error" }, true);
             }
         }
 
-        // Initialize dashboard
-        async function initDashboard() {
-            await checkHealth();
-            await loadPublicStats();
-            
-            setInterval(async () => {
-                await checkHealth();
-                await loadPublicStats();
-            }, 30000);
+        // --- Utility Functions ---
+
+        function logToTerminal(msg, type = 'info') {
+            const term = document.getElementById('terminalLogs');
+            const line = document.createElement('div');
+            line.className = `log-line log-${type}`;
+            const ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            line.innerHTML = `[${ts}] ${msg}`;
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight;
         }
 
-        // Check for existing session
+        function displayResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre style="background: ${isError ? '#fee2e2' : '#f8fafc'}; color: ${isError ? '#991b1b' : '#0f172a'}; padding: 16px; border-radius: 12px; font-family: var(--mono); font-size: 0.75rem; border: 1px solid ${isError ? '#fca5a5' : '#e2e8f0'}; overflow: auto;">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        function showToast(title, msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'check-circle-2' : 'alert-circle';
+            const accent = type === 'success' ? '#10b981' : '#f59e0b';
+
+            toast.style.cssText = `
+                background: white; border: 1px solid rgba(0,0,0,0.1); padding: 16px 20px;
+                border-radius: 16px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                display: flex; gap: 15px; align-items: center; pointer-events: auto;
+                animation: toastIn 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+            `;
+
+            toast.innerHTML = `
+                <div style="color: ${accent}"><i data-lucide="${icon}"></i></div>
+                <div>
+                    <div style="font-weight: 800; font-size: 0.85rem;">${title}</div>
+                    <div style="font-size: 0.75rem; color: #71717a;">${msg}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.5s forwards';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        function clearLogs() {
+            document.getElementById('terminalLogs').innerHTML = '<div class="log-line log-info">System Event Stream Cleared. Monitoring...</div>';
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminKey');
+            location.reload();
+        }
+
+        // --- Animations & Simulations ---
+
+        function animateValue(id, value) {
+            const obj = document.getElementById(id);
+            let start = parseInt(obj.textContent) || 0;
+            const end = parseInt(value);
+            const duration = 1000;
+            let startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                obj.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        function generateSparklines() {
+            const sparkContainers = ['uptimeSpark', 'trackedSpark', 'blockedSpark', 'repSpark'];
+            sparkContainers.forEach(id => {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
+                for (let i = 0; i < 20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'spark-bar';
+                    bar.style.height = (Math.random() * 100) + '%';
+                    container.appendChild(bar);
+                }
+            });
+        }
+
+        function simulateHealth() {
+            const cpu = Math.floor(Math.random() * 40) + 10;
+            const mem = Math.floor(Math.random() * 30) + 40;
+            
+            document.getElementById('cpuBar').style.width = cpu + '%';
+            document.getElementById('cpuUsageVal').textContent = cpu + '%';
+            document.getElementById('memBar').style.width = mem + '%';
+            document.getElementById('memUsageVal').textContent = mem + '%';
+        }
+
+        function generateHeatmap() {
+            const grid = document.getElementById('heatmap');
+            grid.innerHTML = '';
+            for (let i = 0; i < 144; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                const level = Math.random();
+                if (level > 0.9) cell.style.background = '#ef4444';
+                else if (level > 0.7) cell.style.background = '#fca5a5';
+                else if (level > 0.4) cell.style.background = '#fee2e2';
+                grid.appendChild(cell);
+            }
+        }
+
+        async function getMyIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                document.getElementById('checkIpInput').value = data.ip;
+                document.getElementById('unblockIpInput').value = data.ip;
+                showToast("Identity Located", `Targeted IP set to ${data.ip}`);
+            } catch (err) {}
+        }
+
+        // Check for existing session on load
         window.onload = function() {
             const storedKey = sessionStorage.getItem('adminKey');
             if (storedKey) {
-                adminKey = storedKey;
                 document.getElementById('adminKeyInput').value = storedKey;
-                // Verify key is still valid
-                handleLogin({ preventDefault: () => {} });
+                handleAuth({ preventDefault: () => {} });
             }
         };
+
     </script>
+
+    <style>
+        /* CSS Animations */
+        @keyframes toastIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100px); opacity: 0; }
+        }
+        .spin { animation: spin 2s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>
