@@ -527,6 +527,9 @@
                     </div>
                     <div style="font-size: 0.7rem; color: var(--zinc-500); font-family: var(--mono);" id="sessionTimer">Session: --:--</div>
                 </div>
+                <div style="text-align: center; font-size: 0.65rem; color: var(--zinc-400); margin-top: 10px;">
+                    © 2026 SecureScan V6
+                </div>
             </div>
         </aside>
 
@@ -1126,6 +1129,8 @@
                 const health = await healthRes.json();
                 const stats = await statsRes.json();
 
+                console.log('Admin stats received:', stats); // Debug log
+
                 // Measure API latency
                 const latency = Date.now() - startTime;
                 document.getElementById('apiLatencyVal').textContent = latency + 'ms';
@@ -1138,12 +1143,12 @@
                 
                 // IP & Reputation Telemetry
                 if (stats.success && stats.ipReputation) {
-                    animateValue('trackedVal', stats.ipReputation.trackedIPs);
-                    animateValue('blockedVal', stats.ipReputation.blockedIPs);
-                    document.getElementById('repVal').textContent = stats.ipReputation.averageReputationScore + '%';
+                    animateValue('trackedVal', stats.ipReputation.trackedIPs || 0);
+                    animateValue('blockedVal', stats.ipReputation.blockedIPs || 0);
+                    document.getElementById('repVal').textContent = (stats.ipReputation.averageReputationScore || 0) + '%';
                     
                     // Update Node Config Gauges based on real tracked IP volume
-                    const ratePerc = Math.min(Math.floor((stats.ipReputation.trackedIPs / 1000) * 100), 100);
+                    const ratePerc = Math.min(Math.floor(((stats.ipReputation.trackedIPs || 0) / 1000) * 100), 100);
                     const gaugeEl = document.getElementById('rateLimitGauge');
                     if(gaugeEl) {
                         gaugeEl.textContent = ratePerc + '%';
@@ -1158,6 +1163,7 @@
 
                 logToTerminal("System telemetry updated from primary Render node.", "success");
             } catch (err) {
+                console.error('Stats update error:', err);
                 logToTerminal("Network sync failed. Primary node unreachable.", "error");
                 document.getElementById('apiStatusBadge').className = 'badge badge-danger';
                 document.getElementById('apiStatusBadge').innerHTML = '<i data-lucide="alert-circle" size="12"></i> API: ERROR';
