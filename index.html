@@ -508,29 +508,76 @@
             100% { transform: scale(4); opacity: 0; }
         }
 
-        /* --- ADMIN MODAL --- */
+        /* --- ENHANCED ADMIN MODAL --- */
         .modal-backdrop {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(9, 9, 11, 0.9);
+            backdrop-filter: blur(20px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .admin-modal {
             background: white;
-            padding: 40px;
+            padding: 50px;
             border-radius: 30px;
-            width: 450px;
+            width: 500px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            animation: modalSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--zinc-200);
         }
 
-        .admin-modal h2 { margin-bottom: 10px; font-weight: 800; }
-        .admin-modal p { color: var(--zinc-500); font-size: 0.9rem; margin-bottom: 25px; }
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .admin-modal h2 { margin-bottom: 10px; font-weight: 800; font-size: 1.8rem; }
+        .admin-modal p { color: var(--zinc-500); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6; }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--zinc-50);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--zinc-600);
+            margin-bottom: 20px;
+        }
+
+        .auth-attempts {
+            font-size: 0.75rem;
+            color: var(--accent-warn);
+            margin-top: 15px;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--zinc-200);
+            border-top-color: var(--zinc-950);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* Footer */
         footer {
@@ -791,7 +838,7 @@
             <p>Join thousands of organizations protecting their communications with SecureScan V6.</p>
             <div style="display: flex; gap: 15px; justify-content: center;">
                 <a href="javascript:void(0)" class="btn btn-black" style="background: white; color: var(--zinc-950);" onclick="router.navigate('analyzer')">Get Started Free</a>
-                <a href="javascript:void(0)" class="btn btn-outline" style="border-color: rgba(255,255,255,0.3); color: black;" onclick="openAdminModal()">Admin Access</a>
+                <a href="javascript:void(0)" class="btn btn-outline" style="border-color: rgba(255,255,255,0.3); color: white;" onclick="openAdminModal()">Admin Access</a>
             </div>
         </div>
 
@@ -883,21 +930,52 @@
         </div>
     </section>
 
-    <!-- ADMIN MODAL -->
+    <!-- ENHANCED ADMIN MODAL -->
     <div class="modal-backdrop" id="adminModal">
         <div class="admin-modal">
-            <div style="background: var(--zinc-950); color: white; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;"><i data-lucide="lock" size="30"></i></div>
-            <h2>Admin Authorization</h2>
-            <p>Enter your V6 Admin Key to access the command center. This will redirect you to the admin dashboard.</p>
-            <input type="password" id="modalKey" class="input-control" placeholder="Enter X-API-KEY" style="background: #f4f4f5; text-align: center;">
-            <button class="btn btn-black" style="width: 100%;" onclick="validateAdmin()">Verify & Enter</button>
-            <button class="btn btn-outline" style="width: 100%; margin-top: 10px; border: none;" onclick="closeAdminModal()">Cancel</button>
+            <div style="background: linear-gradient(135deg, var(--zinc-950) 0%, var(--zinc-800) 100%); color: white; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <i data-lucide="shield-check" size="35"></i>
+            </div>
+            <h2>Administrator Authorization</h2>
+            <p>Access restricted to authorized security administrators. Please provide your V6 Admin API key to proceed to the command center.</p>
+            
+            <div class="security-badge">
+                <i data-lucide="lock" size="14"></i>
+                256-bit Encrypted Session
+            </div>
+            
+            <input type="password" id="modalKey" class="input-control" placeholder="Enter Admin API Key" style="background: #f9fafb; text-align: center; font-family: var(--mono); font-size: 0.9rem; letter-spacing: 1px;">
+            
+            <div id="authError" style="color: var(--accent-danger); font-size: 0.85rem; margin-top: 12px; font-weight: 600; display: none; background: #fee2e2; padding: 10px; border-radius: 8px;">
+                <i data-lucide="alert-circle" size="14" style="vertical-align: middle;"></i> Authentication failed. Invalid credentials.
+            </div>
+            
+            <div class="auth-attempts" id="authAttempts"></div>
+            
+            <button class="btn btn-black" style="width: 100%; height: 55px; margin-top: 20px;" onclick="validateAdmin()" id="authBtn">
+                <span id="authBtnText">Verify & Authenticate</span>
+                <div class="loading-spinner" id="authSpinner"></div>
+            </button>
+            
+            <button class="btn btn-outline" style="width: 100%; margin-top: 12px; border: none; background: var(--zinc-50); color: var(--zinc-600);" onclick="closeAdminModal()">
+                Cancel
+            </button>
+            
+            <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--zinc-100); font-size: 0.75rem; color: var(--zinc-400);">
+                <i data-lucide="shield-alert" size="12" style="vertical-align: middle;"></i> All authentication attempts are logged and monitored
+            </div>
         </div>
     </div>
 
     <script>
         lucide.createIcons();
         const API_URL = 'https://email-security-api.onrender.com';
+
+        // Enhanced security tracking
+        let authAttempts = 0;
+        const MAX_AUTH_ATTEMPTS = 5;
+        const LOCKOUT_DURATION = 300000; // 5 minutes
+        let lockoutUntil = null;
 
         // --- Router ---
         const router = {
@@ -911,6 +989,7 @@
                 if(pageId === 'intel') intel.fetch();
                 if(pageId === 'home') loadHomeStats();
                 window.scrollTo(0,0);
+                lucide.createIcons();
             }
         };
 
@@ -1013,10 +1092,10 @@
                     
                     const data = await res.json();
                     term.innerHTML += `[${new Date().toLocaleTimeString()}] Analysis complete!\n`;
-                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Risk Level: ${data.riskLevel}\n`;
-                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Threats found: ${data.threats?.length || 0}\n`;
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Risk Level: ${data.analysis?.riskLevel || data.riskLevel || 'Unknown'}\n`;
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Threats found: ${data.analysis?.threats?.length || data.threats?.length || 0}\n`;
                     
-                    if(data.success) this.render(data);
+                    if(data.success || data.analysis) this.render(data.analysis || data);
                 } catch(e) { 
                     term.innerHTML += `[${new Date().toLocaleTimeString()}] ERROR: ${e.message}\n`;
                 }
@@ -1061,16 +1140,51 @@
             }
         };
 
-        // --- Admin Integration ---
+        // --- ENHANCED Admin Integration with Security ---
         function openAdminModal() { 
-            document.getElementById('adminModal').style.display = 'flex'; 
+            // Check if user is locked out
+            if (lockoutUntil && Date.now() < lockoutUntil) {
+                const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 1000);
+                alert(`Too many failed attempts. Please wait ${remainingTime} seconds before trying again.`);
+                return;
+            }
+            
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('modalKey').value = '';
+            document.getElementById('authError').style.display = 'none';
             lucide.createIcons();
         }
-        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+        
+        function closeAdminModal() { 
+            document.getElementById('adminModal').style.display = 'none'; 
+        }
 
         async function validateAdmin() {
-            const key = document.getElementById('modalKey').value;
-            if(!key) return alert('Please enter an API key');
+            // Check lockout
+            if (lockoutUntil && Date.now() < lockoutUntil) {
+                const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 1000);
+                alert(`Account temporarily locked. Please wait ${remainingTime} seconds.`);
+                return;
+            }
+
+            const key = document.getElementById('modalKey').value.trim();
+            const authBtn = document.getElementById('authBtn');
+            const authBtnText = document.getElementById('authBtnText');
+            const authSpinner = document.getElementById('authSpinner');
+            const authError = document.getElementById('authError');
+            
+            if(!key) {
+                authError.textContent = 'Please enter an API key';
+                authError.style.display = 'block';
+                lucide.createIcons();
+                return;
+            }
+
+            // Show loading state
+            authBtn.disabled = true;
+            authBtnText.style.display = 'none';
+            authSpinner.style.display = 'inline-block';
+            authError.style.display = 'none';
 
             try {
                 const res = await fetch(`${API_URL}/api/admin/security-stats`, {
@@ -1078,15 +1192,81 @@
                 });
 
                 if(res.ok) {
+                    // Success - store key and redirect
                     sessionStorage.setItem('adminKey', key);
-                    window.location.href = 'admin.html';
+                    authAttempts = 0; // Reset attempts
+                    
+                    // Animate success
+                    authBtnText.textContent = 'Access Granted!';
+                    authBtnText.style.display = 'inline';
+                    authSpinner.style.display = 'none';
+                    authBtn.style.background = 'var(--accent-safe)';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 800);
                 } else {
-                    alert("Authorization Failed: Invalid Admin Key.");
+                    throw new Error('Invalid credentials');
                 }
             } catch(e) {
-                alert("Server Connection Error: " + e.message);
+                // Failed authentication
+                authAttempts++;
+                
+                authError.innerHTML = `<i data-lucide="alert-circle" size="14" style="vertical-align: middle;"></i> Authentication failed. Invalid API key.`;
+                authError.style.display = 'block';
+                
+                // Show attempt count
+                const attemptsRemaining = MAX_AUTH_ATTEMPTS - authAttempts;
+                if (attemptsRemaining > 0) {
+                    const attemptsEl = document.getElementById('authAttempts');
+                    attemptsEl.textContent = `${attemptsRemaining} attempt${attemptsRemaining !== 1 ? 's' : ''} remaining before temporary lockout`;
+                    attemptsEl.style.display = 'block';
+                }
+                
+                // Lockout after max attempts
+                if (authAttempts >= MAX_AUTH_ATTEMPTS) {
+                    lockoutUntil = Date.now() + LOCKOUT_DURATION;
+                    authError.innerHTML = `<i data-lucide="lock" size="14" style="vertical-align: middle;"></i> Too many failed attempts. Account locked for 5 minutes.`;
+                    authBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        lockoutUntil = null;
+                        authAttempts = 0;
+                        authBtn.disabled = false;
+                        closeAdminModal();
+                    }, LOCKOUT_DURATION);
+                }
+                
+                // Shake animation on error
+                gsap.fromTo('.admin-modal', 
+                    { x: -10 }, 
+                    { x: 10, repeat: 5, yoyo: true, duration: 0.05, ease: 'power1.inOut', onComplete: () => {
+                        gsap.set('.admin-modal', { x: 0 });
+                    }}
+                );
+                
+                lucide.createIcons();
+            } finally {
+                authBtn.disabled = false;
+                authBtnText.textContent = 'Verify & Authenticate';
+                authBtnText.style.display = 'inline';
+                authSpinner.style.display = 'none';
+                lucide.createIcons();
             }
         }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalKeyInput = document.getElementById('modalKey');
+            if (modalKeyInput) {
+                modalKeyInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        validateAdmin();
+                    }
+                });
+            }
+        });
 
         // Initialize
         router.navigate('home');
