@@ -854,31 +854,31 @@
                     <ul class="footer-links">
                         <li><a href="javascript:void(0)" onclick="router.navigate('analyzer')">Analyzer</a></li>
                         <li><a href="javascript:void(0)" onclick="router.navigate('intel')">Intelligence</a></li>
-                        <li><a href="javascript:void(0)">API Docs</a></li>
-                        <li><a href="javascript:void(0)">Chrome Extension</a></li>
+                        <li><a href="javascript:void(0)" onclick="showComingSoon('API Documentation')">API Docs</a></li>
+                        <li><a href="javascript:void(0)" onclick="showComingSoon('Chrome Extension')">Chrome Extension</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Resources</h4>
                     <ul class="footer-links">
-                        <li><a href="javascript:void(0)">Documentation</a></li>
-                        <li><a href="javascript:void(0)">Blog</a></li>
-                        <li><a href="javascript:void(0)">Security Reports</a></li>
-                        <li><a href="javascript:void(0)">Support</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.open('https://github.com/Anthropic/anthropic-sdk-python', '_blank')">Documentation</a></li>
+                        <li><a href="javascript:void(0)" onclick="showComingSoon('Blog')">Blog</a></li>
+                        <li><a href="javascript:void(0)" onclick="router.navigate('intel')">Security Reports</a></li>
+                        <li><a href="javascript:void(0)" onclick="showComingSoon('Support')">Support</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Company</h4>
                     <ul class="footer-links">
-                        <li><a href="javascript:void(0)">About Us</a></li>
-                        <li><a href="javascript:void(0)">Careers</a></li>
-                        <li><a href="javascript:void(0)">Privacy Policy</a></li>
-                        <li><a href="javascript:void(0)">Terms of Service</a></li>
+                        <li><a href="javascript:void(0)" onclick="showAboutModal()">About Us</a></li>
+                        <li><a href="javascript:void(0)" onclick="showComingSoon('Careers')">Careers</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPrivacyModal()">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)" onclick="showTermsModal()">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 SecureScan V6. All rights reserved. Built with security-first principles.</p>
+                <p>&copy; 2026 SecureScan V6. All rights reserved. Built with security-first principles.</p>
             </div>
         </footer>
     </section>
@@ -1004,16 +1004,23 @@
                 const health = await healthRes.json();
                 const stats = await statsRes.json();
 
+                console.log('Stats received:', stats); // Debug log
+
                 // Update home page stats
                 document.getElementById('home-uptime').textContent = Math.floor(health.uptime / 60) + 'm';
                 
                 if (stats.success && stats.ipReputation) {
-                    document.getElementById('home-tracked-ips').textContent = stats.ipReputation.trackedIPs;
-                    document.getElementById('home-blocked-ips').textContent = stats.ipReputation.blockedIPs;
-                    document.getElementById('home-avg-rep').textContent = stats.ipReputation.averageReputationScore + '%';
+                    // The ipReputation object contains the data directly
+                    document.getElementById('home-tracked-ips').textContent = stats.ipReputation.trackedIPs || 0;
+                    document.getElementById('home-blocked-ips').textContent = stats.ipReputation.blockedIPs || 0;
+                    document.getElementById('home-avg-rep').textContent = (stats.ipReputation.averageReputationScore || 0) + '%';
                 }
             } catch (e) {
-                console.error('Failed to load home stats');
+                console.error('Failed to load home stats:', e);
+                // Set defaults on error
+                document.getElementById('home-tracked-ips').textContent = '0';
+                document.getElementById('home-blocked-ips').textContent = '0';
+                document.getElementById('home-avg-rep').textContent = '0%';
             }
         }
 
@@ -1023,13 +1030,19 @@
                 try {
                     const res = await fetch(`${API_URL}/api/analysis/stats`);
                     const data = await res.json();
-                    if(data.success) {
-                        document.getElementById('i-tracked').innerText = data.ipReputation.trackedIPs;
-                        document.getElementById('i-blocked').innerText = data.ipReputation.blockedIPs;
-                        document.getElementById('i-rep').innerText = data.ipReputation.averageReputationScore + '%';
+                    console.log('Intel stats:', data); // Debug log
+                    if(data.success && data.ipReputation) {
+                        document.getElementById('i-tracked').innerText = data.ipReputation.trackedIPs || 0;
+                        document.getElementById('i-blocked').innerText = data.ipReputation.blockedIPs || 0;
+                        document.getElementById('i-rep').innerText = (data.ipReputation.averageReputationScore || 0) + '%';
                         this.spawnPings();
                     }
-                } catch(e) { console.error("Intel Error"); }
+                } catch(e) { 
+                    console.error("Intel Error:", e);
+                    document.getElementById('i-tracked').innerText = '0';
+                    document.getElementById('i-blocked').innerText = '0';
+                    document.getElementById('i-rep').innerText = '0%';
+                }
             },
             spawnPings() {
                 const box = document.getElementById('mapBox');
@@ -1267,6 +1280,139 @@
                 });
             }
         });
+
+        // --- Footer Link Functions ---
+        function showComingSoon(feature) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="admin-modal" style="max-width: 400px;">
+                    <div style="background: linear-gradient(135deg, var(--brand-accent) 0%, #1d4ed8 100%); color: white; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
+                        <i data-lucide="zap" size="35"></i>
+                    </div>
+                    <h2 style="font-weight: 800; margin-bottom: 12px;">Coming Soon</h2>
+                    <p style="color: var(--zinc-500); font-size: 0.95rem; margin-bottom: 30px;">
+                        ${feature} is currently under development and will be available in a future release.
+                    </p>
+                    <button class="btn btn-black" style="width: 100%;" onclick="this.closest('.modal-backdrop').remove()">
+                        Got it
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            lucide.createIcons();
+        }
+
+        function showAboutModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="admin-modal" style="max-width: 600px;">
+                    <div style="background: linear-gradient(135deg, var(--zinc-950) 0%, var(--zinc-800) 100%); color: white; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <i data-lucide="shield-check" size="35"></i>
+                    </div>
+                    <h2 style="font-weight: 800; margin-bottom: 12px;">About SecureScan V6</h2>
+                    <p style="color: var(--zinc-600); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.7; text-align: left;">
+                        SecureScan V6 is an enterprise-grade email security platform that leverages advanced machine learning algorithms and real-time threat intelligence to protect organizations from phishing, malware, and social engineering attacks.
+                    </p>
+                    <p style="color: var(--zinc-600); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.7; text-align: left;">
+                        Our system analyzes over 50 threat vectors in real-time, providing comprehensive protection with minimal false positives. Built on modern cloud infrastructure with enterprise-grade security standards.
+                    </p>
+                    <div style="background: var(--zinc-50); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 10px;">Key Features:</div>
+                        <ul style="text-align: left; font-size: 0.85rem; color: var(--zinc-600); margin-left: 20px; line-height: 1.8;">
+                            <li>ML-powered threat detection</li>
+                            <li>Real-time IP reputation tracking</li>
+                            <li>Advanced heuristic analysis</li>
+                            <li>Global threat intelligence network</li>
+                            <li>Enterprise API integration</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-black" style="width: 100%;" onclick="this.closest('.modal-backdrop').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            lucide.createIcons();
+        }
+
+        function showPrivacyModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="admin-modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                    <h2 style="font-weight: 800; margin-bottom: 20px;">Privacy Policy</h2>
+                    <div style="text-align: left; font-size: 0.9rem; color: var(--zinc-600); line-height: 1.7;">
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Data Collection</h3>
+                        <p>SecureScan V6 collects and processes email metadata and content solely for the purpose of security analysis. We employ industry-standard encryption and security practices to protect your data.</p>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Information We Collect</h3>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Email sender and recipient information</li>
+                            <li>Email subject lines and body content (for analysis only)</li>
+                            <li>IP addresses and reputation scores</li>
+                            <li>Threat detection metadata</li>
+                        </ul>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Data Security</h3>
+                        <p>All data is encrypted in transit and at rest. We implement comprehensive security measures including rate limiting, anomaly detection, and automatic threat blocking.</p>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Data Retention</h3>
+                        <p>Analysis data is retained for security purposes and automatically purged according to our retention policies. User data is never shared with third parties without explicit consent.</p>
+                        
+                        <p style="margin-top: 20px; font-size: 0.85rem; color: var(--zinc-500);">Last Updated: January 2026</p>
+                    </div>
+                    <button class="btn btn-black" style="width: 100%; margin-top: 20px;" onclick="this.closest('.modal-backdrop').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            lucide.createIcons();
+        }
+
+        function showTermsModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="admin-modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                    <h2 style="font-weight: 800; margin-bottom: 20px;">Terms of Service</h2>
+                    <div style="text-align: left; font-size: 0.9rem; color: var(--zinc-600); line-height: 1.7;">
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Acceptance of Terms</h3>
+                        <p>By accessing and using SecureScan V6, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Use License</h3>
+                        <p>Permission is granted to use SecureScan V6 for email security analysis purposes. This license shall automatically terminate if you violate any of these restrictions.</p>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Acceptable Use</h3>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Use the service only for legitimate security analysis</li>
+                            <li>Do not attempt to circumvent security measures</li>
+                            <li>Do not abuse API rate limits</li>
+                            <li>Respect intellectual property rights</li>
+                        </ul>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Service Availability</h3>
+                        <p>While we strive for maximum uptime, SecureScan V6 is provided "as is" without warranties of any kind. We reserve the right to modify or discontinue the service at any time.</p>
+                        
+                        <h3 style="font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: var(--zinc-900);">Limitation of Liability</h3>
+                        <p>SecureScan V6 shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.</p>
+                        
+                        <p style="margin-top: 20px; font-size: 0.85rem; color: var(--zinc-500);">Last Updated: January 2026</p>
+                    </div>
+                    <button class="btn btn-black" style="width: 100%; margin-top: 20px;" onclick="this.closest('.modal-backdrop').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            lucide.createIcons();
+        }
 
         // Initialize
         router.navigate('home');
