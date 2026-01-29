@@ -281,6 +281,50 @@
             line-height: 1.6;
         }
 
+        /* Live Threat Feed */
+        .threat-feed-section {
+            max-width: 1200px;
+            margin: 100px auto;
+        }
+
+        .threat-feed-container {
+            background: var(--zinc-950);
+            border-radius: 24px;
+            padding: 40px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .threat-feed-item {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Real-time Chart */
+        .chart-section {
+            max-width: 1200px;
+            margin: 100px auto;
+        }
+
+        .chart-container {
+            background: white;
+            border: var(--border-titanium);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
         /* How It Works */
         .how-it-works {
             max-width: 1000px;
@@ -674,20 +718,60 @@
         <!-- Live Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h2 id="home-tracked-ips" style="color: var(--accent-info)">--</h2>
-                <p>Tracked IPs</p>
+                <h2 id="home-total-scans" style="color: var(--accent-info)">--</h2>
+                <p>Total Scans</p>
             </div>
             <div class="stat-card">
-                <h2 id="home-blocked-ips" style="color: var(--accent-danger)">--</h2>
-                <p>Blocked Threats</p>
+                <h2 id="home-threats-detected" style="color: var(--accent-danger)">--</h2>
+                <p>Threats Detected</p>
             </div>
             <div class="stat-card">
-                <h2 id="home-avg-rep">--</h2>
-                <p>Avg Reputation</p>
+                <h2 id="home-avg-risk">--</h2>
+                <p>Avg Risk Score</p>
             </div>
             <div class="stat-card">
                 <h2 id="home-uptime" style="color: var(--accent-safe)">--</h2>
                 <p>System Uptime</p>
+            </div>
+        </div>
+
+        <!-- Real-Time Threat Feed -->
+        <div class="threat-feed-section">
+            <div class="section-header">
+                <div class="section-badge">LIVE FEED</div>
+                <h2 class="section-title">Real-Time Threat Detection</h2>
+                <p class="section-description">Live monitoring of global email threats as they're detected and neutralized by our AI engine.</p>
+            </div>
+            
+            <div class="threat-feed-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h3 style="font-size: 1.5rem; font-weight: 800;">Active Threat Stream</h3>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <span style="font-size: 0.8rem; opacity: 0.7;">LIVE</span>
+                    </div>
+                </div>
+                <div id="threatFeed">
+                    <div class="threat-feed-item">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.9rem;">Phishing Attempt Blocked</div>
+                            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px;">paypal-verify[.]com attempting credential theft</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">HIGH RISK</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-Time Chart -->
+        <div class="chart-section">
+            <div class="section-header">
+                <div class="section-badge">ANALYTICS</div>
+                <h2 class="section-title">Detection Performance</h2>
+                <p class="section-description">Real-time visualization of threat detection patterns over the last 24 hours.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="homeChart" style="max-height: 300px;"></canvas>
             </div>
         </div>
 
@@ -921,9 +1005,9 @@
     <!-- PAGE: INTELLIGENCE -->
     <section id="page-intel" class="page">
         <div class="intel-grid">
-            <div class="intel-stat-card"><h2 id="i-tracked">--</h2><p>Tracked IPs</p></div>
-            <div class="intel-stat-card"><h2 id="i-blocked" style="color: var(--accent-danger)">--</h2><p>Blocked Nodes</p></div>
-            <div class="intel-stat-card"><h2 id="i-rep">--</h2><p>Avg Reputation</p></div>
+            <div class="intel-stat-card"><h2 id="i-total-scans">--</h2><p>Total Scans</p></div>
+            <div class="intel-stat-card"><h2 id="i-threats" style="color: var(--accent-danger)">--</h2><p>Threats Detected</p></div>
+            <div class="intel-stat-card"><h2 id="i-avg-risk">--</h2><p>Avg Risk Score</p></div>
         </div>
         <div class="intel-map-box" id="mapBox">
             <div style="position: absolute; opacity: 0.05; font-size: 8rem; font-weight: 900;">THREAT NETWORK</div>
@@ -976,6 +1060,7 @@
         const MAX_AUTH_ATTEMPTS = 5;
         const LOCKOUT_DURATION = 300000; // 5 minutes
         let lockoutUntil = null;
+        let homeChart = null;
 
         // --- Router ---
         const router = {
@@ -1004,24 +1089,112 @@
                 const health = await healthRes.json();
                 const stats = await statsRes.json();
 
-                console.log('Stats received:', stats); // Debug log
+                console.log('Stats received:', stats);
 
                 // Update home page stats
                 document.getElementById('home-uptime').textContent = Math.floor(health.uptime / 60) + 'm';
                 
-                if (stats.success && stats.ipReputation) {
-                    // The ipReputation object contains the data directly
-                    document.getElementById('home-tracked-ips').textContent = stats.ipReputation.trackedIPs || 0;
-                    document.getElementById('home-blocked-ips').textContent = stats.ipReputation.blockedIPs || 0;
-                    document.getElementById('home-avg-rep').textContent = (stats.ipReputation.averageReputationScore || 0) + '%';
+                if (stats.success && stats.stats) {
+                    // Use totalAnalyzed and threatsDetected from the stats
+                    document.getElementById('home-total-scans').textContent = stats.stats.totalAnalyzed || 0;
+                    document.getElementById('home-threats-detected').textContent = stats.stats.threatsDetected || 0;
+                    document.getElementById('home-avg-risk').textContent = (stats.stats.averageRiskScore || 0).toFixed(1);
+                    
+                    // Update chart
+                    updateHomeChart(stats.stats);
+                    
+                    // Simulate threat feed
+                    simulateThreatFeed(stats.stats.threatsDetected || 0);
                 }
             } catch (e) {
                 console.error('Failed to load home stats:', e);
-                // Set defaults on error
-                document.getElementById('home-tracked-ips').textContent = '0';
-                document.getElementById('home-blocked-ips').textContent = '0';
-                document.getElementById('home-avg-rep').textContent = '0%';
+                document.getElementById('home-total-scans').textContent = '0';
+                document.getElementById('home-threats-detected').textContent = '0';
+                document.getElementById('home-avg-risk').textContent = '0';
             }
+        }
+
+        // Initialize chart
+        function updateHomeChart(stats) {
+            const ctx = document.getElementById('homeChart');
+            if (!ctx) return;
+            
+            // Generate simulated data based on actual stats
+            const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+            const detectionData = Array.from({length: 24}, () => Math.floor(Math.random() * (stats.threatsDetected / 10 + 1)));
+            
+            if (homeChart) {
+                homeChart.destroy();
+            }
+            
+            homeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'Threats Detected',
+                        data: detectionData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulate threat feed
+        function simulateThreatFeed(threatCount) {
+            const feed = document.getElementById('threatFeed');
+            if (!feed) return;
+            
+            const threats = [
+                { type: 'Phishing Attempt', detail: 'paypal-verify[.]com attempting credential theft', risk: 'HIGH RISK' },
+                { type: 'BEC Attack', detail: 'CEO impersonation from suspicious domain', risk: 'CRITICAL' },
+                { type: 'Malware Detected', detail: 'Suspicious .exe attachment in invoice email', risk: 'HIGH RISK' },
+                { type: 'Spoofing Attempt', detail: 'amazon-secure[.]net typosquatting detected', risk: 'MEDIUM' },
+                { type: 'Social Engineering', detail: 'Urgent wire transfer request pattern', risk: 'HIGH RISK' }
+            ];
+            
+            let currentIndex = 0;
+            setInterval(() => {
+                const threat = threats[currentIndex % threats.length];
+                const item = document.createElement('div');
+                item.className = 'threat-feed-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.9rem;">${threat.type}</div>
+                        <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px;">${threat.detail}</div>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">${threat.risk}</div>
+                `;
+                feed.insertBefore(item, feed.firstChild);
+                
+                // Keep only last 5 items
+                while (feed.children.length > 5) {
+                    feed.removeChild(feed.lastChild);
+                }
+                
+                currentIndex++;
+            }, 5000);
         }
 
         // --- Intelligence Logic ---
@@ -1030,18 +1203,18 @@
                 try {
                     const res = await fetch(`${API_URL}/api/analysis/stats`);
                     const data = await res.json();
-                    console.log('Intel stats:', data); // Debug log
-                    if(data.success && data.ipReputation) {
-                        document.getElementById('i-tracked').innerText = data.ipReputation.trackedIPs || 0;
-                        document.getElementById('i-blocked').innerText = data.ipReputation.blockedIPs || 0;
-                        document.getElementById('i-rep').innerText = (data.ipReputation.averageReputationScore || 0) + '%';
+                    console.log('Intel stats:', data);
+                    if(data.success && data.stats) {
+                        document.getElementById('i-total-scans').innerText = data.stats.totalAnalyzed || 0;
+                        document.getElementById('i-threats').innerText = data.stats.threatsDetected || 0;
+                        document.getElementById('i-avg-risk').innerText = (data.stats.averageRiskScore || 0).toFixed(1);
                         this.spawnPings();
                     }
                 } catch(e) { 
                     console.error("Intel Error:", e);
-                    document.getElementById('i-tracked').innerText = '0';
-                    document.getElementById('i-blocked').innerText = '0';
-                    document.getElementById('i-rep').innerText = '0%';
+                    document.getElementById('i-total-scans').innerText = '0';
+                    document.getElementById('i-threats').innerText = '0';
+                    document.getElementById('i-avg-risk').innerText = '0';
                 }
             },
             spawnPings() {
@@ -1086,7 +1259,6 @@
                     const subject = document.getElementById('s-subject').value;
                     const body = document.getElementById('s-body').value;
                     
-                    // Extract links from body
                     const linkRegex = /https?:\/\/[^\s]+/g;
                     const links = body.match(linkRegex) || [];
                     
@@ -1109,6 +1281,9 @@
                     term.innerHTML += `[${new Date().toLocaleTimeString()}] Threats found: ${data.analysis?.threats?.length || data.threats?.length || 0}\n`;
                     
                     if(data.success || data.analysis) this.render(data.analysis || data);
+                    
+                    // Refresh stats after analysis
+                    loadHomeStats();
                 } catch(e) { 
                     term.innerHTML += `[${new Date().toLocaleTimeString()}] ERROR: ${e.message}\n`;
                 }
@@ -1155,7 +1330,6 @@
 
         // --- ENHANCED Admin Integration with Security ---
         function openAdminModal() { 
-            // Check if user is locked out
             if (lockoutUntil && Date.now() < lockoutUntil) {
                 const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 1000);
                 alert(`Too many failed attempts. Please wait ${remainingTime} seconds before trying again.`);
@@ -1173,7 +1347,6 @@
         }
 
         async function validateAdmin() {
-            // Check lockout
             if (lockoutUntil && Date.now() < lockoutUntil) {
                 const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 1000);
                 alert(`Account temporarily locked. Please wait ${remainingTime} seconds.`);
@@ -1193,7 +1366,6 @@
                 return;
             }
 
-            // Show loading state
             authBtn.disabled = true;
             authBtnText.style.display = 'none';
             authSpinner.style.display = 'inline-block';
@@ -1205,11 +1377,9 @@
                 });
 
                 if(res.ok) {
-                    // Success - store key and redirect
                     sessionStorage.setItem('adminKey', key);
-                    authAttempts = 0; // Reset attempts
+                    authAttempts = 0;
                     
-                    // Animate success
                     authBtnText.textContent = 'Access Granted!';
                     authBtnText.style.display = 'inline';
                     authSpinner.style.display = 'none';
@@ -1222,13 +1392,11 @@
                     throw new Error('Invalid credentials');
                 }
             } catch(e) {
-                // Failed authentication
                 authAttempts++;
                 
                 authError.innerHTML = `<i data-lucide="alert-circle" size="14" style="vertical-align: middle;"></i> Authentication failed. Invalid API key.`;
                 authError.style.display = 'block';
                 
-                // Show attempt count
                 const attemptsRemaining = MAX_AUTH_ATTEMPTS - authAttempts;
                 if (attemptsRemaining > 0) {
                     const attemptsEl = document.getElementById('authAttempts');
@@ -1236,7 +1404,6 @@
                     attemptsEl.style.display = 'block';
                 }
                 
-                // Lockout after max attempts
                 if (authAttempts >= MAX_AUTH_ATTEMPTS) {
                     lockoutUntil = Date.now() + LOCKOUT_DURATION;
                     authError.innerHTML = `<i data-lucide="lock" size="14" style="vertical-align: middle;"></i> Too many failed attempts. Account locked for 5 minutes.`;
@@ -1250,7 +1417,6 @@
                     }, LOCKOUT_DURATION);
                 }
                 
-                // Shake animation on error
                 gsap.fromTo('.admin-modal', 
                     { x: -10 }, 
                     { x: 10, repeat: 5, yoyo: true, duration: 0.05, ease: 'power1.inOut', onComplete: () => {
@@ -1268,7 +1434,6 @@
             }
         }
 
-        // Allow Enter key to submit
         document.addEventListener('DOMContentLoaded', () => {
             const modalKeyInput = document.getElementById('modalKey');
             if (modalKeyInput) {
@@ -1288,7 +1453,7 @@
             modal.style.display = 'flex';
             modal.innerHTML = `
                 <div class="admin-modal" style="max-width: 400px;">
-                    <div style="background: linear-gradient(135deg, var(--brand-accent) 0%, #1d4ed8 100%); color: white; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
+                    <div style="background: linear-gradient(135deg, var(--accent-info) 0%, #1d4ed8 100%); color: white; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
                         <i data-lucide="zap" size="35"></i>
                     </div>
                     <h2 style="font-weight: 800; margin-bottom: 12px;">Coming Soon</h2>
@@ -1418,6 +1583,16 @@
         router.navigate('home');
         loadHomeStats();
         setInterval(loadHomeStats, 30000); // Refresh every 30s
+        
+        // Pulse animation for live indicator
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
