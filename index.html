@@ -6,12 +6,13 @@
     <title>SecureScan V6 | Enterprise Email Intelligence & ML Analysis</title>
     
     <!-- Professional Metadata & Assets -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <link rel="icon" href="https://static.thenounproject.com/png/2084849-200.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- Core Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -23,7 +24,12 @@
             --zinc-50: #fafafa;
             --zinc-100: #f4f4f5;
             --zinc-200: #e4e4e7;
+            --zinc-300: #d4d4d8;
+            --zinc-400: #a1a1aa;
             --zinc-500: #71717a;
+            --zinc-600: #52525b;
+            --zinc-700: #3f3f46;
+            --zinc-800: #27272a;
             --zinc-900: #18181b;
             --zinc-950: #09090b;
 
@@ -32,6 +38,7 @@
             --accent-warn: #f59e0b;
             --accent-danger: #ef4444;
             --accent-info: #3b82f6;
+            --accent-purple: #a855f7;
 
             --nav-height: 80px;
             --sidebar-width: 300px;
@@ -133,9 +140,9 @@
             border: 1px solid transparent;
         }
 
-        .btn-black { background: var(--zinc-950); color: white; }
+        .btn-black { background: var(--zinc-950); color: white; text-decoration: none; }
         .btn-black:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        .btn-outline { border: 1px solid var(--zinc-200); background: white; color: var(--zinc-900); }
+        .btn-outline { border: 1px solid var(--zinc-200); background: white; color: var(--zinc-900); text-decoration: none; }
 
         /* --- Page Router Styling --- */
         .page {
@@ -153,7 +160,7 @@
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
-            padding: 80px 0;
+            padding: 80px 0 60px;
         }
 
         .hero h1 {
@@ -169,6 +176,217 @@
             color: var(--zinc-500);
             max-width: 750px;
             margin: 0 auto 48px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 80px auto;
+        }
+
+        .stat-card {
+            background: white;
+            border: var(--border-titanium);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .stat-card h2 { font-size: 3rem; font-weight: 800; margin-bottom: 8px; }
+        .stat-card p { font-size: 0.8rem; font-weight: 700; color: var(--zinc-400); text-transform: uppercase; }
+
+        /* Features Section */
+        .features-section {
+            max-width: 1200px;
+            margin: 100px auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-badge {
+            background: var(--zinc-100);
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+        }
+
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--zinc-500);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border: var(--border-titanium);
+            padding: 32px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--zinc-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: var(--zinc-500);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            max-width: 1000px;
+            margin: 100px auto;
+        }
+
+        .steps-container {
+            display: grid;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--zinc-950);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .step-content h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--zinc-500);
+            line-height: 1.7;
+        }
+
+        /* Technology Stack */
+        .tech-stack {
+            background: white;
+            border: var(--border-titanium);
+            border-radius: 24px;
+            padding: 60px;
+            max-width: 1200px;
+            margin: 100px auto;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--zinc-50);
+            border-radius: 16px;
+        }
+
+        .tech-item i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .tech-item h4 {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .tech-item p {
+            font-size: 0.85rem;
+            color: var(--zinc-500);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--zinc-950) 0%, var(--zinc-800) 100%);
+            color: white;
+            border-radius: 30px;
+            padding: 80px 60px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 100px auto 60px;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* --- PAGE: Analyzer --- */
@@ -231,6 +449,18 @@
             font-size: 0.75rem;
             height: 200px;
             overflow-y: auto;
+        }
+
+        /* Results Card */
+        .result-card {
+            padding: 20px;
+            border-bottom: 1px solid var(--zinc-100);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- PAGE: Intelligence --- */
@@ -302,6 +532,68 @@
         .admin-modal h2 { margin-bottom: 10px; font-weight: 800; }
         .admin-modal p { color: var(--zinc-500); font-size: 0.9rem; margin-bottom: 25px; }
 
+        /* Footer */
+        footer {
+            background: white;
+            border-top: var(--border-titanium);
+            padding: 60px;
+            margin-top: 100px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .footer-brand p {
+            color: var(--zinc-500);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .footer-section h4 {
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--zinc-500);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--zinc-950);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: var(--border-titanium);
+            color: var(--zinc-500);
+            font-size: 0.85rem;
+        }
+
     </style>
 </head>
 <body>
@@ -331,6 +623,217 @@
                 <button class="btn btn-outline" onclick="router.navigate('intel')">View Global Intel</button>
             </div>
         </div>
+
+        <!-- Live Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2 id="home-tracked-ips" style="color: var(--accent-info)">--</h2>
+                <p>Tracked IPs</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="home-blocked-ips" style="color: var(--accent-danger)">--</h2>
+                <p>Blocked Threats</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="home-avg-rep">--</h2>
+                <p>Avg Reputation</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="home-uptime" style="color: var(--accent-safe)">--</h2>
+                <p>System Uptime</p>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="section-header">
+                <div class="section-badge">CORE CAPABILITIES</div>
+                <h2 class="section-title">Enterprise-Grade Protection</h2>
+                <p class="section-description">Powered by advanced machine learning algorithms and real-time threat intelligence from global security networks.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="brain" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">ML-Powered Analysis</h3>
+                    <p class="feature-description">Advanced pattern recognition using neural networks trained on millions of phishing attempts to detect emerging threats.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="shield-alert" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">Real-Time Protection</h3>
+                    <p class="feature-description">Instant analysis and threat detection with sub-second response times for immediate email security.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="globe" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">Global Threat Network</h3>
+                    <p class="feature-description">Connected to worldwide security intelligence feeds tracking malicious actors across all continents.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="link" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">Link Analysis</h3>
+                    <p class="feature-description">Deep inspection of URLs including typosquatting detection, homograph attacks, and malicious redirects.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="fingerprint" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">Sender Verification</h3>
+                    <p class="feature-description">SPF, DKIM, and DMARC validation combined with behavioral analysis to detect impersonation attempts.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="cpu" size="24"></i>
+                    </div>
+                    <h3 class="feature-title">IP Reputation Tracking</h3>
+                    <p class="feature-description">Dynamic reputation scoring with automatic blocking of malicious sources and pattern-based threat prediction.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="how-it-works">
+            <div class="section-header">
+                <div class="section-badge">WORKFLOW</div>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-description">Our multi-layered security approach ensures comprehensive protection.</p>
+            </div>
+
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Email Ingestion</h3>
+                        <p>System receives email data including headers, body content, attachments, and embedded links for comprehensive analysis.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Multi-Vector Analysis</h3>
+                        <p>Simultaneous scanning across 50+ threat vectors including phishing patterns, malware signatures, social engineering tactics, and anomaly detection.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>ML Classification</h3>
+                        <p>Neural network processes features through trained models to generate risk scores and identify specific threat types with high accuracy.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Threat Intelligence</h3>
+                        <p>Cross-reference with global threat databases, IP reputation systems, and known attacker patterns for enhanced detection.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Action & Report</h3>
+                        <p>Generate detailed security report with actionable insights, threat categorization, and recommended protective measures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Stack -->
+        <div class="tech-stack">
+            <div class="section-header">
+                <div class="section-badge">TECHNOLOGY</div>
+                <h2 class="section-title">Built on Modern Infrastructure</h2>
+            </div>
+
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <i data-lucide="server" style="color: var(--accent-safe)"></i>
+                    <h4>Node.js</h4>
+                    <p>High-performance backend runtime</p>
+                </div>
+                <div class="tech-item">
+                    <i data-lucide="zap" style="color: var(--accent-warn)"></i>
+                    <h4>Express</h4>
+                    <p>Robust API framework</p>
+                </div>
+                <div class="tech-item">
+                    <i data-lucide="shield" style="color: var(--accent-danger)"></i>
+                    <h4>Helmet.js</h4>
+                    <p>Security middleware layer</p>
+                </div>
+                <div class="tech-item">
+                    <i data-lucide="gauge" style="color: var(--accent-info)"></i>
+                    <h4>Rate Limiting</h4>
+                    <p>DDoS protection system</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>Ready to Secure Your Inbox?</h2>
+            <p>Join thousands of organizations protecting their communications with SecureScan V6.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="javascript:void(0)" class="btn btn-black" style="background: white; color: var(--zinc-950);" onclick="router.navigate('analyzer')">Get Started Free</a>
+                <a href="javascript:void(0)" class="btn btn-outline" style="border-color: rgba(255,255,255,0.3); color: white;" onclick="openAdminModal()">Admin Access</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>SecureScan V6</h3>
+                    <p>Enterprise-grade email security powered by machine learning and global threat intelligence. Protecting organizations worldwide since 2024.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="javascript:void(0)" onclick="router.navigate('analyzer')">Analyzer</a></li>
+                        <li><a href="javascript:void(0)" onclick="router.navigate('intel')">Intelligence</a></li>
+                        <li><a href="javascript:void(0)">API Docs</a></li>
+                        <li><a href="javascript:void(0)">Chrome Extension</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="javascript:void(0)">Documentation</a></li>
+                        <li><a href="javascript:void(0)">Blog</a></li>
+                        <li><a href="javascript:void(0)">Security Reports</a></li>
+                        <li><a href="javascript:void(0)">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="javascript:void(0)">About Us</a></li>
+                        <li><a href="javascript:void(0)">Careers</a></li>
+                        <li><a href="javascript:void(0)">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SecureScan V6. All rights reserved. Built with security-first principles.</p>
+            </div>
+        </footer>
     </section>
 
     <!-- PAGE: ANALYZER -->
@@ -341,6 +844,8 @@
                 <div class="tool-item" onclick="analyzer.load('phish')"><i data-lucide="alert-triangle"></i> Phishing Credential</div>
                 <div class="tool-item" onclick="analyzer.load('invoice')"><i data-lucide="file-text"></i> Invoice Fraud (BEC)</div>
                 <div class="tool-item" onclick="analyzer.load('prize')"><i data-lucide="gift"></i> Lottery Scam</div>
+                <div class="tool-item" onclick="analyzer.load('urgent')"><i data-lucide="clock"></i> Urgency Attack</div>
+                <div class="tool-item" onclick="analyzer.load('impersonate')"><i data-lucide="user-x"></i> CEO Impersonation</div>
             </aside>
 
             <main class="panel">
@@ -404,9 +909,34 @@
                 if(document.getElementById('l-' + pageId)) document.getElementById('l-' + pageId).classList.add('active');
                 
                 if(pageId === 'intel') intel.fetch();
+                if(pageId === 'home') loadHomeStats();
                 window.scrollTo(0,0);
             }
         };
+
+        // --- Load real stats for home page ---
+        async function loadHomeStats() {
+            try {
+                const [healthRes, statsRes] = await Promise.all([
+                    fetch(`${API_URL}/health`),
+                    fetch(`${API_URL}/api/analysis/stats`)
+                ]);
+
+                const health = await healthRes.json();
+                const stats = await statsRes.json();
+
+                // Update home page stats
+                document.getElementById('home-uptime').textContent = Math.floor(health.uptime / 60) + 'm';
+                
+                if (stats.success && stats.ipReputation) {
+                    document.getElementById('home-tracked-ips').textContent = stats.ipReputation.trackedIPs;
+                    document.getElementById('home-blocked-ips').textContent = stats.ipReputation.blockedIPs;
+                    document.getElementById('home-avg-rep').textContent = stats.ipReputation.averageReputationScore + '%';
+                }
+            } catch (e) {
+                console.error('Failed to load home stats');
+            }
+        }
 
         // --- Intelligence Logic ---
         const intel = {
@@ -439,9 +969,11 @@
         const analyzer = {
             load(type) {
                 const map = {
-                    phish: {s: 'security@microsoft-verify.com', sub: 'Urgent: Account Access Suspended', b: 'Verify your ID now: http://fake-login.xyz'},
-                    invoice: {s: 'billing@intuit-services.com', sub: 'Invoice #99281 Overdue', b: 'Please pay $1,200 immediately.'},
-                    prize: {s: 'claims@lottery-intl.org', sub: 'YOU WON $1,000,000', b: 'Send bank info to claim.'}
+                    phish: {s: 'security@microsoft-verify.com', sub: 'Urgent: Account Access Suspended', b: 'Your account has been locked. Verify your identity now to restore access: http://fake-login.xyz/verify'},
+                    invoice: {s: 'billing@intuit-services.com', sub: 'Invoice #99281 Overdue - Immediate Payment Required', b: 'Outstanding balance of $1,200.00 due immediately. Pay now to avoid service interruption.'},
+                    prize: {s: 'claims@lottery-intl.org', sub: 'YOU WON $1,000,000 - CLAIM NOW', b: 'Congratulations! You\'ve won our international lottery. Send bank info to claim your prize.'},
+                    urgent: {s: 'support@paypal-security.net', sub: 'URGENT: Suspicious Activity Detected', b: 'We detected unusual activity on your account. Click here immediately: http://paypal-verify.net'},
+                    impersonate: {s: 'ceo@company-executives.com', sub: 'Urgent Wire Transfer Needed', b: 'I need you to process an urgent wire transfer of $50,000 to this account immediately.'}
                 };
                 document.getElementById('s-sender').value = map[type].s;
                 document.getElementById('s-subject').value = map[type].sub;
@@ -451,63 +983,115 @@
                 e.preventDefault();
                 const btn = document.getElementById('runBtn');
                 btn.disabled = true; btn.innerText = "Analyzing Threat Vectors...";
-                document.getElementById('term').innerHTML = `[${new Date().toLocaleTimeString()}] INITIATING ML SCAN...`;
+                
+                const term = document.getElementById('term');
+                term.innerHTML = `[${new Date().toLocaleTimeString()}] INITIATING ML SCAN...\n`;
+                term.innerHTML += `[${new Date().toLocaleTimeString()}] Extracting email features...\n`;
+                term.innerHTML += `[${new Date().toLocaleTimeString()}] Running heuristic analysis...\n`;
 
                 try {
+                    const sender = document.getElementById('s-sender').value;
+                    const subject = document.getElementById('s-subject').value;
+                    const body = document.getElementById('s-body').value;
+                    
+                    // Extract links from body
+                    const linkRegex = /https?:\/\/[^\s]+/g;
+                    const links = body.match(linkRegex) || [];
+                    
                     const res = await fetch(`${API_URL}/api/analysis/analyze`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ email: { from: document.getElementById('s-sender').value, subject: document.getElementById('s-subject').value, body: document.getElementById('s-body').value, links: [] }})
+                        body: JSON.stringify({ 
+                            email: { 
+                                from: sender, 
+                                subject: subject, 
+                                body: body, 
+                                links: links 
+                            }
+                        })
                     });
+                    
                     const data = await res.json();
-                    if(data.success) this.render(data.analysis);
-                } catch(e) { document.getElementById('term').innerText = "CONNECTION FAILED."; }
-                finally { btn.disabled = false; btn.innerText = "Execute Deep Scan"; }
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Analysis complete!\n`;
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Risk Level: ${data.riskLevel}\n`;
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] Threats found: ${data.threats?.length || 0}\n`;
+                    
+                    if(data.success) this.render(data);
+                } catch(e) { 
+                    term.innerHTML += `[${new Date().toLocaleTimeString()}] ERROR: ${e.message}\n`;
+                }
+                finally { 
+                    btn.disabled = false; 
+                    btn.innerText = "Execute Deep Scan"; 
+                }
             },
-            render(a) {
+            render(data) {
                 document.getElementById('emptyRes').style.display = 'none';
                 const card = document.createElement('div');
-                card.style.padding = '20px';
-                card.style.borderBottom = '1px solid var(--zinc-100)';
+                card.className = 'result-card';
+                
+                const riskColor = {
+                    'High': 'var(--accent-danger)',
+                    'Medium': 'var(--accent-warn)',
+                    'Low': 'var(--accent-safe)'
+                }[data.riskLevel] || 'var(--zinc-500)';
+                
+                let threatsHtml = '';
+                if (data.threats && data.threats.length > 0) {
+                    threatsHtml = '<div style="margin-top: 12px;"><strong style="font-size: 0.75rem;">Detected Threats:</strong><ul style="margin: 8px 0 0 20px; font-size: 0.75rem; color: var(--zinc-600);">';
+                    data.threats.slice(0, 5).forEach(t => {
+                        threatsHtml += `<li style="margin-bottom: 4px;">${t.type}: ${t.detail}</li>`;
+                    });
+                    threatsHtml += '</ul></div>';
+                }
+                
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span style="font-weight:800; color:${a.riskLevel==='High'?'var(--accent-danger)':'var(--accent-safe)'}">${a.riskLevel} Risk</span>
-                        <span style="font-weight:800;">Score: ${a.riskScore}</span>
+                        <span style="font-weight:800; color:${riskColor}">${data.riskLevel} Risk</span>
+                        <span style="font-weight:800;">Score: ${data.riskScore}/100</span>
                     </div>
-                    <p style="font-size:0.8rem; color:var(--zinc-500);">${a.summary.keyPoints[0]}</p>
+                    <p style="font-size:0.85rem; color:var(--zinc-600); line-height: 1.6;">${data.summary?.keyPoints?.[0] || 'Analysis complete'}</p>
+                    ${threatsHtml}
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--zinc-100); font-size: 0.7rem; color: var(--zinc-400);">
+                        ${new Date().toLocaleString()}
+                    </div>
                 `;
                 document.getElementById('resList').appendChild(card);
+                lucide.createIcons();
             }
         };
 
         // --- Admin Integration ---
-        function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
+        function openAdminModal() { 
+            document.getElementById('adminModal').style.display = 'flex'; 
+            lucide.createIcons();
+        }
         function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
         async function validateAdmin() {
             const key = document.getElementById('modalKey').value;
-            if(!key) return;
+            if(!key) return alert('Please enter an API key');
 
-            // Attempt to verify key against your admin endpoint
             try {
                 const res = await fetch(`${API_URL}/api/admin/security-stats`, {
                     headers: { 'X-API-Key': key }
                 });
 
                 if(res.ok) {
-                    // STORE KEY IN SESSIONSTORAGE (Your admin.html looks for this)
                     sessionStorage.setItem('adminKey', key);
-                    // REDIRECT TO YOUR ADMIN.HTML
                     window.location.href = 'admin.html';
                 } else {
                     alert("Authorization Failed: Invalid Admin Key.");
                 }
             } catch(e) {
-                alert("Server Connection Error.");
+                alert("Server Connection Error: " + e.message);
             }
         }
 
+        // Initialize
         router.navigate('home');
+        loadHomeStats();
+        setInterval(loadHomeStats, 30000); // Refresh every 30s
     </script>
 </body>
 </html>
