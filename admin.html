@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Scan V6 | Global Admin Command Center</title>
+    <title>Secure Scam V6 | Global Admin Command Center</title>
     
-    <!-- Professional Assets -->
+    <!-- Professional Assets & Global Identity -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%230f172a' /><stop offset='100%' style='stop-color:%23334155' /></linearGradient></defs><path d='M50 5 L15 25 V50 C15 75 50 95 50 95 C50 95 85 75 85 50 V25 L50 5Z' fill='url(%23g)' /><path d='M50 20 L30 35 V50 C30 65 50 80 50 80 C50 80 70 65 70 50 V35 L50 20Z' fill='white' opacity='0.2' /><circle cx='50' cy='45' r='10' fill='white' opacity='0.8' /></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- Core Engine Scripts -->
+    <!-- Professional Scripting Engines -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
@@ -65,10 +65,10 @@
             color: var(--zinc-900);
             font-family: var(--pjs);
             line-height: 1.5;
-            overflow: hidden; 
+            overflow: hidden; /* Prevent body scroll, use panel scroll */
         }
 
-        /* --- Global Noise Texture --- */
+        /* --- Global Noise Texture Overlay --- */
         body::before {
             content: "";
             position: fixed;
@@ -166,7 +166,7 @@
         .search-box input { background: transparent; border: none; outline: none; width: 100%; font-size: 0.9rem; font-family: inherit; }
 
         .view-container { flex: 1; padding: 40px; overflow-y: auto; display: none; }
-        .view-container.active { display: block; animation: viewFade 0.4s ease-out; }
+        .view-container.active { display: block; opacity: 1; animation: viewFade 0.4s ease-out; }
         @keyframes viewFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Auth Layer --- */
@@ -257,11 +257,11 @@
         .grid-cell { aspect-ratio: 1; border-radius: 2px; background: var(--zinc-100); cursor: pointer; transition: 0.2s; }
         .grid-cell:hover { transform: scale(1.5); z-index: 10; }
 
-        /* --- Gauge Components for Node Config --- */
+        /* --- Node Config Specifics --- */
         .gauge-container { display: flex; align-items: center; gap: 20px; padding: 20px; background: var(--zinc-50); border-radius: 16px; margin-bottom: 15px; }
         .gauge-circle { width: 60px; height: 60px; border-radius: 50%; border: 6px solid var(--zinc-200); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; }
         
-        /* --- Hunter Visualization --- */
+        /* --- Hunter Scanner Animation --- */
         .hunt-scanner { height: 2px; background: var(--status-danger); position: absolute; width: 100%; top: 0; left: 0; box-shadow: 0 0 15px var(--status-danger); animation: huntScan 3s linear infinite; display: none;}
         @keyframes huntScan { 0% { top: 0; } 100% { top: 100%; } }
 
@@ -387,7 +387,7 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-                    <!-- Top Violators -->
+                    <!-- Top Violators Table -->
                     <div class="card-main">
                         <div class="card-header">
                             <h3 class="card-title"><i data-lucide="user-x"></i> High-Risk Threat Actors</h3>
@@ -413,7 +413,7 @@
                         </div>
                     </div>
 
-                    <!-- System Health -->
+                    <!-- Node Health Panel -->
                     <div class="card-main">
                         <div class="card-header"><h3 class="card-title"><i data-lucide="cpu"></i> Node Performance</h3></div>
                         <div style="display: grid; gap: 20px;">
@@ -446,7 +446,7 @@
                         <p style="font-size: 0.8rem; color: var(--zinc-500);">Real-time malicious traffic density mapping</p>
                     </div>
                     <div class="threat-grid" id="heatmap">
-                        <!-- 144 cells injected via JS -->
+                        <!-- Heatmap cells injected via JS -->
                     </div>
                     <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.7rem; color: var(--zinc-400); font-weight: 700;">
                         <span style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #f4f4f5; border-radius: 2px;"></div> LOW TRAFFIC</span>
@@ -483,7 +483,7 @@
                 </div>
             </div>
 
-            <!-- VIEW: THREAT HUNTER (NEWLY FUNCTIONAL) -->
+            <!-- VIEW: THREAT HUNTER -->
             <div id="view-threat-hunter" class="view-container">
                 <div style="display: grid; grid-template-columns: 350px 1fr; gap: 24px;">
                     <div class="card-main" style="height: fit-content;">
@@ -539,7 +539,7 @@
                 </div>
             </div>
 
-            <!-- VIEW: NODE CONFIG (NEWLY FUNCTIONAL) -->
+            <!-- VIEW: NODE CONFIG -->
             <div id="view-settings" class="view-container">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                     <div class="card-main">
@@ -549,7 +549,7 @@
                                 <div class="gauge-circle" style="border-color: var(--status-safe);">100%</div>
                                 <div>
                                     <div style="font-weight: 700; font-size: 0.9rem;">API Gateway</div>
-                                    <div style="font-size: 0.75rem; color: var(--zinc-500);">Render Cloud • Oregon-v6</div>
+                                    <div style="font-size: 0.75rem; color: var(--zinc-500);">Render Cloud • Global-v6</div>
                                 </div>
                             </div>
                             <div class="gauge-container">
@@ -624,7 +624,7 @@
         let healthTimer = null;
         let huntActive = false;
 
-        // Views Controller
+        // Unified View Switching Logic
         function switchView(viewId) {
             document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -632,7 +632,7 @@
             const targetView = document.getElementById('view-' + viewId);
             if(targetView) targetView.classList.add('active');
             
-            // Highlight nav item
+            // Highlight nav item by text/icon match
             const items = document.querySelectorAll('.nav-item');
             items.forEach(item => {
                 if (item.innerText.toLowerCase().includes(viewId.replace('-', ' '))) {
@@ -640,21 +640,22 @@
                 }
             });
 
-            logToTerminal(`Navigated to: ${viewId.toUpperCase()}`, 'info');
+            logToTerminal(`System Routing: Switched context to ${viewId.toUpperCase()}`, 'info');
             lucide.createIcons();
         }
 
-        // Authentication Engine
+        // Authentication & Session Persistence
         async function handleAuth(event) {
             event.preventDefault();
             const key = document.getElementById('adminKeyInput').value;
             const btn = document.getElementById('authBtn');
             
             btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="refresh-cw" class="spin"></i> Authenticating...';
+            btn.innerHTML = '<i data-lucide="refresh-cw" class="spin"></i> Validating Gateway...';
             lucide.createIcons();
 
             try {
+                // Testing credentials against the security-stats endpoint
                 const response = await fetch(`${API_BASE_URL}/api/admin/security-stats`, {
                     headers: { 'X-API-Key': key }
                 });
@@ -668,7 +669,9 @@
                 }
             } catch (err) {
                 document.getElementById('authError').style.display = 'block';
+                // GSAP Shake effect on fail
                 gsap.fromTo(".auth-card", { x: -10 }, { x: 10, repeat: 5, yoyo: true, duration: 0.05 });
+                logToTerminal("Unauthorized access attempt blocked.", "error");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Authorize Session';
@@ -685,7 +688,7 @@
             }});
         }
 
-        // --- Data Fetching ---
+        // --- Data Orchestration ---
 
         async function initDashboard() {
             updateLiveStats();
@@ -701,6 +704,7 @@
             generateSparklines();
         }
 
+        // Real-Time Telemetry Updates
         async function updateLiveStats() {
             try {
                 const [healthRes, statsRes] = await Promise.all([
@@ -711,30 +715,34 @@
                 const health = await healthRes.json();
                 const stats = await statsRes.json();
 
-                // Uptime
+                // Uptime Logic
                 document.getElementById('uptimeVal').textContent = Math.floor(health.uptime / 60) + 'm';
                 
-                // IP Stats
+                // IP & Reputation Telemetry
                 if (stats.success && stats.ipReputation) {
                     animateValue('trackedVal', stats.ipReputation.trackedIPs);
                     animateValue('blockedVal', stats.ipReputation.blockedIPs);
                     document.getElementById('repVal').textContent = stats.ipReputation.averageReputationScore + '%';
                     
-                    // Update Node Config Gauges
+                    // Update Node Config Gauges based on real tracked IP volume
                     const ratePerc = Math.min(Math.floor((stats.ipReputation.trackedIPs / 1000) * 100), 100);
-                    document.getElementById('rateLimitGauge').textContent = ratePerc + '%';
-                    document.getElementById('rateLimitGauge').style.borderColor = ratePerc > 80 ? 'var(--status-danger)' : 'var(--brand-accent)';
+                    const gaugeEl = document.getElementById('rateLimitGauge');
+                    if(gaugeEl) {
+                        gaugeEl.textContent = ratePerc + '%';
+                        gaugeEl.style.borderColor = ratePerc > 80 ? 'var(--status-danger)' : 'var(--brand-accent)';
+                    }
                 }
 
-                logToTerminal("Live telemetry updated from backend node.", "success");
+                logToTerminal("System telemetry updated from primary Render node.", "success");
             } catch (err) {
-                logToTerminal("Failed to refresh telemetry. Network error.", "error");
+                logToTerminal("Network sync failed. Primary node unreachable.", "error");
             }
         }
 
+        // Fetch High-Risk Threat Actors
         async function loadViolators() {
             const tableBody = document.querySelector('#violatorsTable tbody');
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><i data-lucide="refresh-cw" class="spin"></i> Fetching records...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><i data-lucide="refresh-cw" class="spin"></i> Syncing Data...</td></tr>';
             lucide.createIcons();
 
             try {
@@ -747,7 +755,7 @@
                     tableBody.innerHTML = '';
                     data.topViolators.forEach(v => {
                         const tr = document.createElement('tr');
-                        const statusBadge = v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge badge-warn">Active</span>';
+                        const statusBadge = v.blocked ? '<span class="badge badge-danger">Blocked</span>' : '<span class="badge badge-warn">Monitored</span>';
                         tr.innerHTML = `
                             <td style="font-family: var(--mono); font-weight: 600;">${v.ip}</td>
                             <td>${v.score}/100</td>
@@ -759,13 +767,13 @@
                     });
                 }
             } catch (err) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--status-danger);">Failed to load violators.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--status-danger);">Critical: Telemetry Load Failure.</td></tr>';
             }
         }
 
-        // --- View Specific Functions ---
+        // --- Security Modules ---
 
-        // Threat Hunter Logic
+        // Heuristic Threat Hunter logic
         async function startHunt() {
             if(huntActive) return;
             huntActive = true;
@@ -775,13 +783,12 @@
             const scanner = document.getElementById('huntScanner');
             
             scanner.style.display = 'block';
-            status.textContent = 'Active Scan';
+            status.textContent = 'Scanning...';
             status.className = 'badge badge-danger';
             results.innerHTML = '';
             
-            logToTerminal("Initiating Global Heuristic Threat Hunt...", "info");
+            logToTerminal("Initiating Global Pattern Matcher (GPM)...", "info");
             
-            // Real hunt logic: Fetch violators to use as "Targets"
             try {
                 const response = await fetch(`${API_BASE_URL}/api/admin/security-stats`, {
                     headers: { 'X-API-Key': adminKey }
@@ -791,7 +798,7 @@
                 if(data.success && data.topViolators) {
                     let i = 0;
                     const huntInterval = setInterval(() => {
-                        if(i >= data.topViolators.length || i >= 10) {
+                        if(i >= data.topViolators.length || i >= 8) {
                             clearInterval(huntInterval);
                             finishHunt();
                             return;
@@ -808,17 +815,17 @@
                         huntItem.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="font-family: var(--mono); font-weight: 800; color: var(--status-danger);">${v.ip}</div>
-                                <div class="badge badge-danger">Target Identified</div>
+                                <div class="badge badge-danger">High Risk Pattern</div>
                             </div>
                             <div style="font-size: 0.75rem; color: var(--zinc-500); margin-top: 5px;">
-                                Pattern Match: Reputation Score ${v.score} • Violations: ${v.violations}
+                                Heuristics: Potential BEC / Fraud Injection detected. Reputation: ${v.score}
                             </div>
                         `;
                         
                         results.prepend(huntItem);
-                        logToTerminal(`Target Locked: ${v.ip} - Score: ${v.score}`, "warn");
+                        logToTerminal(`Threat Locked: ${v.ip} identified via heuristics.`, "warn");
                         i++;
-                    }, 1200);
+                    }, 1000);
                 }
             } catch (err) {
                 finishHunt();
@@ -828,14 +835,16 @@
         function finishHunt() {
             huntActive = false;
             document.getElementById('huntScanner').style.display = 'none';
-            document.getElementById('huntStatus').textContent = 'Scan Complete';
+            document.getElementById('huntStatus').textContent = 'Hunt Complete';
             document.getElementById('huntStatus').className = 'badge badge-safe';
-            showToast("Hunt Complete", "Heuristic analysis of global violators finished.");
+            showToast("Intelligence Complete", "Finished mapping current violator patterns.");
         }
+
+        // --- IP & API Operations ---
 
         async function checkIP() {
             const ip = document.getElementById('checkIpInput').value;
-            if (!ip) return showToast("Input Required", "Please enter a valid IP address.", "warn");
+            if (!ip) return showToast("Target Missing", "Provide an IP for the scan.", "warn");
 
             const resDiv = document.getElementById('checkIpResponse');
             resDiv.innerHTML = '<i data-lucide="refresh-cw" class="spin"></i> Querying Database...';
@@ -847,7 +856,7 @@
                 });
                 const data = await response.json();
                 displayResponse('checkIpResponse', data, !data.success);
-                logToTerminal(`Queried reputation for IP: ${ip}`, 'info');
+                logToTerminal(`System log: Manual reputation check for ${ip}`, 'info');
             } catch (err) {
                 displayResponse('checkIpResponse', { error: err.message }, true);
             }
@@ -863,7 +872,7 @@
             const ip = document.getElementById('unblockIpInput').value;
             if (!ip) return;
 
-            if (!confirm(`Are you certain you wish to revoke the block for ${ip}?`)) return;
+            if (!confirm(`Confirm revocation of blocking for ${ip}?`)) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/admin/unblock/${ip}`, {
@@ -874,7 +883,7 @@
                 displayResponse('unblockIpResponse', data, !data.success);
                 
                 if (data.success) {
-                    showToast("Defense Revoked", `IP ${ip} has been removed from the blocklist.`);
+                    showToast("Security Revoked", `Defensive block for ${ip} cleared.`);
                     updateLiveStats();
                     loadViolators();
                 }
@@ -885,7 +894,7 @@
 
         async function testAnalysis() {
             const resDiv = document.getElementById('testApiResponse');
-            resDiv.innerHTML = '<i data-lucide="zap" class="spin"></i> Processing...';
+            resDiv.innerHTML = '<i data-lucide="zap" class="spin"></i> Testing Vector...';
             lucide.createIcons();
 
             try {
@@ -897,13 +906,13 @@
                 });
                 const data = await response.json();
                 displayResponse('testApiResponse', data, !data.success);
-                logToTerminal("API Analysis simulation completed.", "success");
+                logToTerminal("Analysis simulation vector executed successfully.", "success");
             } catch (err) {
-                displayResponse('testApiResponse', { error: "Invalid JSON or Network Error" }, true);
+                displayResponse('testApiResponse', { error: "Invalid JSON Structure" }, true);
             }
         }
 
-        // --- Utility Functions ---
+        // --- System Utilities ---
 
         function logToTerminal(msg, type = 'info') {
             const term = document.getElementById('terminalLogs');
@@ -951,7 +960,7 @@
         }
 
         function clearLogs() {
-            document.getElementById('terminalLogs').innerHTML = '<div class="log-line log-info">System Event Stream Cleared. Monitoring...</div>';
+            document.getElementById('terminalLogs').innerHTML = '<div class="log-line log-info">Logs Cleared. Monitoring Kernel...</div>';
         }
 
         function logout() {
@@ -959,7 +968,7 @@
             location.reload();
         }
 
-        // --- Animations & Simulations ---
+        // --- Visual Simulations ---
 
         function animateValue(id, value) {
             const obj = document.getElementById(id);
@@ -1023,11 +1032,10 @@
                 const data = await res.json();
                 document.getElementById('checkIpInput').value = data.ip;
                 document.getElementById('unblockIpInput').value = data.ip;
-                showToast("Identity Located", `Targeted IP set to ${data.ip}`);
             } catch (err) {}
         }
 
-        // Check for existing session on load
+        // Persistence Logic: Verify key if stored
         window.onload = function() {
             const storedKey = sessionStorage.getItem('adminKey');
             if (storedKey) {
@@ -1039,7 +1047,7 @@
     </script>
 
     <style>
-        /* CSS Animations */
+        /* CSS Animations for UX */
         @keyframes toastIn {
             from { transform: translateX(100px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
